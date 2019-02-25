@@ -5,6 +5,9 @@ import os
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.tools import deltaR
+from PhysicsTools.NanoAODTools.postprocessing.modules.EdgeZ.edgeFriends import _susyEdgeTight, _susyEdgeLoose
+
+
 
 def IPnISOcuts(cand):
     if abs(cand.dz)  > 0.1: return False
@@ -15,7 +18,8 @@ def IPnISOcuts(cand):
 
 def isClean(cand, coll):
     for l in coll: 
-        if deltaR(cand,l) < 0.2: return False
+        if deltaR(cand,l) < 0.2: 
+            return False
     return True
 
 class IsoTrackAnalysis(Module):
@@ -43,7 +47,7 @@ class IsoTrackAnalysis(Module):
 
         ret = {}
         for br,ty in self.brList: ret[br] = [] 
-
+        toclean = [] 
         ## Leptons
         for cand in muon+elec: 
             if not cand.isPFcand: continue
@@ -55,24 +59,21 @@ class IsoTrackAnalysis(Module):
             if cand.pfRelIso03_chg*pt > 5: continue
             if cand.pfRelIso03_chg > 0.2: continue
             nPFLep5 = nPFLep5 + 1 
+            toclean.append(cand)
+
+        # additional leptons to clean up
+        toclean.extend( filter( lambda x : _susyEdgeLoose(x) and _susyEdgeTight(x), muon+elec)[:2])
 
         for cand in tracks:
             if not cand.isPFcand   : continue 
             if not cand.fromPV     : continue
             if cand.isFromLostTrack: continue
-            if abs(cand.pdgId) == 11 or abs(cand.pdgId) == 13:
-                if cand.pt < 5 or abs(cand.eta) > 2.4: continue
-                if not IPnISOcuts(cand): continue
-                # cleaning at the end so its faster
-                if not isClean(cand, muon+elec): continue
-                nPFLep5 = nPFLep5 + 1 
                     
-            else: 
-                pt = cand.pt 
-                if pt < 10 or abs(cand.eta) > 2.4: continue
-                if not IPnISOcuts(cand): continue
-                if not isClean(cand, muon+elec): continue
-                nPFHad10 = nPFHad10 + 1 
+            if abs(cand.pdgId) == 11 and abs(cand.pdgId) == 13: continue
+            if cand.pt < 10 or abs(cand.eta) > 2.4: continue
+            if not IPnISOcuts(cand): continue
+            if not isClean(cand, toclean): continue
+            nPFHad10 = nPFHad10 + 1 
 
             
 
