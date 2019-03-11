@@ -106,7 +106,7 @@ class edgeFriends:
                              'HLT_PFHT780',
                              'HLT_PFHT890',
                              'HLT_PFHT1050',
-                             'HLT_PFMET120_PFMHT120_IDTight'
+                             'HLT_PFMET120_PFMHT120_IDTight',
                              'HLT_PFMET120_PFMHT120_IDTight_PFHT60',
                          ]
 
@@ -346,18 +346,23 @@ class edgeFriends:
 
         ################### Definition of good leptons (this goes first so skim is done first)
         lepst = []
+        nLepLoose = 0
         for il,lep in enumerate(leps):
             if not _susyEdgeLoose(lep): 
                 continue
+            nLepLoose += 1 
             if not self.tightLeptonSel(lep): 
                 continue
             lepst.append(lep)
+
+        
 
         lepst.sort(key = lambda x : x.pt, reverse=True)
         nLepTight = len(lepst)
         
         if nLepTight < 2: return False
         self.out.fillBranch('nLepTight'        + self.label, nLepTight)
+        self.out.fillBranch('nLepLoose'        + self.label, nLepLoose)
 
 
         # jet stuff 
@@ -527,8 +532,8 @@ class edgeFriends:
             lcount = 1
             lepret = {} 
             for lep in [lepst[0],lepst[1]]:
-                for lfloat in 'pt eta phi miniPFRelIso_all pdgId mvaFall17V1Iso mvaFall17V1noIso dxy dz sip3d pfRelIso03_all pfRelIso04_all tightCharge genPartFlav'.split():
-                    if lfloat == 'mcMatchId' and isData:
+                for lfloat in 'pt eta phi miniPFRelIso_all pdgId mvaFall17V1Iso mvaFall17V1noIso dxy dz sip3d pfRelIso03_all pfRelIso04_all tightCharge'.split():
+                    if lfloat == 'genPartFlav' and isData:
                         lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = 1
                     else:
                         lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = getattr(lep,lfloat)
