@@ -61,8 +61,6 @@ class IsoTrackAnalysis(Module):
             nPFLep5 = nPFLep5 + 1 
             toclean.append(cand)
 
-        # additional leptons to clean up
-        toclean.extend( filter( lambda x : _susyEdgeLoose(x) and _susyEdgeTight(x), muon+elec)[:2])
 
         for cand in tracks:
             if not cand.isPFcand   : continue 
@@ -72,7 +70,7 @@ class IsoTrackAnalysis(Module):
             if abs(cand.pdgId) == 11 and abs(cand.pdgId) == 13: continue
             if cand.pt < 10 or abs(cand.eta) > 2.4: continue
             if not IPnISOcuts(cand): continue
-            if not isClean(cand, toclean): continue
+            if not isClean(cand, muon+elec): continue
             nPFHad10 = nPFHad10 + 1 
 
             
