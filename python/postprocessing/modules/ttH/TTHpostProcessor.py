@@ -77,7 +77,7 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
                     break
 
     else:
-        selectedSamples=mcSamples
+        selectedSamples= mcSamples
         for sample in selectedSamples: sample.options['isData'] = False
 
 
@@ -133,20 +133,14 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         if (abs(lep.pdgId)!=13 or lep.mediumId>0) and lep.mvaTTH > 0.90: return lep.pt
         else: return 0.90 * lep.pt * (1+lep.jetRelIso)
 
-    objCleaning = ObjectCleaning( looseLeptonSelection = lambda x : preselectLepton(x),
-                                  FOLeptonSelection    = lambda x : clean_and_FO_selection_TTH(x),
-                                  FOTauSelection       = lambda x : _FOTauSel(x),
-                                  jetSelection         = lambda jet: abs(jet.eta)<2.4 and _bitFromInt(jet.jetId,2) and (jet.pt) > 15,
-                                  conePt               = lambda x : conept_TTH(x),
-                                  )
                                   
     puAutoWeight     = puAutoWeight()
     
     from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
 
+    mod = [] 
+    addFlags = AddFlags([(('isData','F'), lambda ev : sampOpt['isData'] )])
 
-    mod = [objCleaning ] 
-    
     if not sampOpt['isData']:
         # add pile-up weight before any skim
         mod = [puAutoWeight] + mod
@@ -158,8 +152,25 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         mod.extend([jmeUncert]) # jetmetUncertainties2017All()
     
         ## add xsec branch
-        addFlags = AddFlags([ (('xsec','F'), lambda ev : sampOpt['xsec'] ) ])
-        mod.extend([addFlags])
+        addFlags.flags.append(  (('xsec','F'), lambda ev : sampOpt['xsec'] ))
+                   
+    mod.append(addFlags)
+
+    # cleaning must come after jecs. otherwise variations are not stored in selected jets...
+    objCleaning = ObjectCleaning( looseLeptonSelection = lambda x : preselectLepton(x),
+                                  FOLeptonSelection    = lambda x : clean_and_FO_selection_TTH(x),
+                                  FOTauSelection       = lambda x : _FOTauSel(x),
+                                  jetSelection         = lambda jet: abs(jet.eta)<2.4 and _bitFromInt(jet.jetId,2) and (jet.pt) > 15,
+                                  conePt               = lambda x : conept_TTH(x),
+                                  jetPts=[25,40],
+                                  jetSel={ "JetCentral" : lambda x : abs(x.eta) < 2.4,
+                                           "JetForward" : lambda x : abs(x.eta) > 2.4 } ,
+                                  btagL_thr=0.1522,
+                                  btagM_thr=0.4941,
+                                  doJetSums=True,
+                                  )
+
+    mod.append( objCleaning )
     
     
     if 'triggers' in sampOpt:
