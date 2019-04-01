@@ -45,7 +45,7 @@ class ObjectCleaning(Module):
         self.doJetSums                 = doJetSums
         self.jetPts                    = jetPts
 
-        self.systsJEC = {0:""  , 1:"_jesTotalUp", -1:"_jetTotalDown"}
+        self.systsJEC = {0:""  , 1:"_jesTotalUp", -1:"_jesTotalDown"}
 
         #self._helper_muonFO    = CollectionSkimmer("MuonFO","Muon", maxSize=20)
         #self._helper_elecFO    = CollectionSkimmer("ElecFO","Electron", maxSize=20)

@@ -10,6 +10,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import *
 
 import json
 
+raw_input('Warning, no skim is applied')
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
@@ -31,6 +32,7 @@ inputSlim  = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postpro
 
 
 doData=getCrabOption("doData",False)
+
 
 if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
 
@@ -148,7 +150,7 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         ## add jet met uncertainties
         from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017All, jetmetUncertainties2017
         jmeUncert = jetmetUncertainties2017()
-        jmeUncert.metBranchName = 'METFixEE2017'
+        jmeUncert.metBranchName = 'METFixEE2017' if sampOpt['year'] == '2017' else 'MET'
         mod.extend([jmeUncert]) # jetmetUncertainties2017All()
     
         ## add xsec branch

@@ -170,3 +170,4 @@ samples = TT + V + ttV + ST + VV + VVV + Rare
 
 for sample in samples:
     sample.options['isData'] = False
+    sample.options['year']   = '2017'
