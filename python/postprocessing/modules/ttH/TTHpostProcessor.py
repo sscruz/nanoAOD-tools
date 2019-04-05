@@ -107,11 +107,14 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     def preselectMuon(lep):
         return lep.pt > 5 and abs(lep.eta) < 2.4 and abs(lep.dxy) < 0.05 and abs(lep.dz) < 0.1 and lep.miniPFRelIso_all < 0.4 and lep.sip3d < 8
 
-    def preselectElectron(lep):
-        return lep.pt > 7 and abs(lep.eta) < 2.5 and abs(lep.dxy) < 0.05 and abs(lep.dz) < 0.1 and lep.miniPFRelIso_all < 0.4  and lep.sip3d < 8 and lep.mvaFall17V1noIso_WPL and lep.lostHits <=1
+    def preselectElectron(lep, year):
+        if year == 2016: return lep.pt > 7 and abs(lep.eta) < 2.5 and abs(lep.dxy) < 0.05 and abs(lep.dz) < 0.1 and lep.miniPFRelIso_all < 0.4  and lep.sip3d < 8 and lep.mvaSpring16HZZ_WPL and lep.lostHits <=1
+        elif year == 2017: return lep.pt > 7 and abs(lep.eta) < 2.5 and abs(lep.dxy) < 0.05 and abs(lep.dz) < 0.1 and lep.miniPFRelIso_all < 0.4  and lep.sip3d < 8 and lep.mvaFall17V1noIso_WPL and lep.lostHits <=1
+        else: raise RuntimeError("Year %d not supported"%year) 
+        
 
-    def preselectLepton(lep):
-        return preselectElectron(lep) if abs(lep.pdgId) == 11 else preselectMuon(lep)
+    def preselectLepton(lep, year):
+        return preselectElectron(lep) if abs(lep.pdgId, year) == 11 else preselectMuon(lep)
     
     def clean_and_FO_selection_TTH(lep):
         return lep.conept>10 and lep.jetBTagDeepCSV<0.4941 and (abs(lep.pdgId)!=11 or (_ttH_idEmu_cuts_E3(lep) and lep.convVeto and lep.lostHits==0)\
@@ -135,13 +138,21 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         if (abs(lep.pdgId)!=13 or lep.mediumId>0) and lep.mvaTTH > 0.90: return lep.pt
         else: return 0.90 * lep.pt * (1+lep.jetRelIso)
 
+    def jetSel(jet):
+        if jet.pt < 15      : return False
+        if abs(jet.eta) > 5 : return False
+        if not _bitFromInt(jet.jetId,2): return False
+        if abs(jet.eta) < 3 and abs(jet.eta) > 2.7 and jet.pt < 60: return False
+        return True
                                   
     puAutoWeight     = puAutoWeight()
     
     from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
 
     mod = [] 
-    addFlags = AddFlags([(('isData','F'), lambda ev : sampOpt['isData'] )])
+    addFlags = AddFlags([(('isData','F'), lambda ev : sampOpt['isData'] ),
+                         (('year','i')  , lambda ev : sampOpt['year'] ),
+                     ])
 
     if not sampOpt['isData']:
         # add pile-up weight before any skim
@@ -159,10 +170,10 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     mod.append(addFlags)
 
     # cleaning must come after jecs. otherwise variations are not stored in selected jets...
-    objCleaning = ObjectCleaning( looseLeptonSelection = lambda x : preselectLepton(x),
+    objCleaning = ObjectCleaning( looseLeptonSelection = lambda x : preselectLepton(x, int(sampOpt['year'])),
                                   FOLeptonSelection    = lambda x : clean_and_FO_selection_TTH(x),
                                   FOTauSelection       = lambda x : _FOTauSel(x),
-                                  jetSelection         = lambda jet: abs(jet.eta)<2.4 and _bitFromInt(jet.jetId,2) and (jet.pt) > 15,
+                                  jetSelection         = lambda jet: jetSel(jet),
                                   conePt               = lambda x : conept_TTH(x),
                                   jetPts=[25,40],
                                   jetSel={ "JetCentral" : lambda x : abs(x.eta) < 2.4,

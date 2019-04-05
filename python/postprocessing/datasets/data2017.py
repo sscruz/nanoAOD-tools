@@ -59,7 +59,8 @@ Electron_noOverlapRemov=[
 
 
 samples = SingleMuon+SingleElectron+MuonEG+DoubleMuon+DoubleElectron+MET#+Electron_noOverlapRemov
-#samples = Electron_noOverlapRemov
+
 for sample in samples:
     sample.options['isData'] = True
     sample.options['year']   = '2017'
+    sample.name = sample.name + '_2017'

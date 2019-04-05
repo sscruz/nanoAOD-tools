@@ -118,6 +118,12 @@ class ObjectCleaning(Module):
         for branch in self.tauBranches:
             self.out.branch('TausFO_%s'%branch[0], _rootLeafType2rootBranchType[branch[1]], lenVar="nTausFO")
 
+        self.out.branch('LepFO_conept'   ,'F', lenVar="nLepFO")
+        self.out.branch('LepLoose_conept','F', lenVar="nLepLoose")
+        self.out.branch('LepFO_jetBTagDeepCSV'   ,'F', lenVar="nLepFO")
+        self.out.branch('LepLoose_jetBTagDeepCSV','F', lenVar="nLepLoose")
+
+
         for pt in self.jetPts:
             for var in self.systsJEC:
                 for sel in self.jetSel:
@@ -177,7 +183,7 @@ class ObjectCleaning(Module):
         tausFO    = filter(self.FOTauSelection,    taus)
         jetsSelec = filter(self.jetSelection,   jets)
 
-        if len(muonFO)+len(elecFO) < 2: return False
+        #if len(muonFO)+len(elecFO) < 2: return False
 
         # we clean taus from loose leptons
         toRemove_tausFO = [] 
@@ -253,12 +259,23 @@ class ObjectCleaning(Module):
 
         lepFO = muonFO+elecFO
         lepFO.sort(key = lambda x : x.pt, reverse=True)
-        for branch in self.lepBranches:
+        for branch in self.lepBranches+[['conept'],['jetBTagDeepCSV']]:
             out = [] 
             branchName = branch[0]
             for obj in lepFO:
                 out.append( getattr(obj, branchName) if hasattr(obj,branchName) else 0)
             self.out.fillBranch("LepFO_%s"%branchName, out)
+
+
+        lepLoose = muonLoose+elecLoose
+        lepLoose.sort(key = lambda x : x.pt, reverse=True)
+        for branch in self.lepBranches+[['conept'],['jetBTagDeepCSV']]:
+            out = [] 
+            branchName = branch[0]
+            for obj in lepLoose:
+                if obj in lepFO: continue
+                out.append( getattr(obj, branchName) if hasattr(obj,branchName) else 0)
+            self.out.fillBranch("LepLoose_%s"%branchName, out)
 
 
         
