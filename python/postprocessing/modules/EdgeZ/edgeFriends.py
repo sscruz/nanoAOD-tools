@@ -129,6 +129,7 @@ class edgeFriends:
                     ("Flag_eeBadScFilter"+label, "I"),
                     ("Flag_ecalBadCalibFilter"+label, "I"),
                     ("Flag_globalTightHalo2016Filter"+label, "I"),
+                    ("Flag_globalSuperTightHalo2016Filter"+label, "I"),
                     ("Flag_badChargedHadronFilter"+label, "F"),
                     ("Flag_badMuonFilter"+label, "F"),
                     ("nLepTight"+label, "I"),
@@ -446,17 +447,16 @@ class edgeFriends:
         self.isSMS =  (masses['GenSusyMScan1'] > 0 or masses['GenSusyMNeutralino2'] > 0)
 
         ################### Filters stuff
-        if not self.isSMS:
-            self.out.fillBranch('Flag_HBHENoiseFilter'                     + self.label ,event.Flag_HBHENoiseFilter                    )
-            self.out.fillBranch('Flag_HBHENoiseIsoFilter'                  + self.label ,event.Flag_HBHENoiseIsoFilter                 )
-            self.out.fillBranch('Flag_EcalDeadCellTriggerPrimitiveFilter'  + self.label ,event.Flag_EcalDeadCellTriggerPrimitiveFilter )
-            self.out.fillBranch('Flag_goodVertices'                        + self.label ,event.Flag_goodVertices                       )
-            self.out.fillBranch('Flag_eeBadScFilter'                       + self.label ,event.Flag_eeBadScFilter                      )
-            self.out.fillBranch('Flag_ecalBadCalibFilter'                  + self.label ,event.Flag_ecalBadCalibFilter                 )
-            self.out.fillBranch('Flag_globalTightHalo2016Filter'           + self.label ,event.Flag_globalTightHalo2016Filter          )
-            self.out.fillBranch('Flag_badMuonFilter'                       + self.label ,event.Flag_BadPFMuonFilter                    )
-            self.out.fillBranch("Flag_badChargedHadronFilter"              + self.label ,event.Flag_BadChargedCandidateFilter          )
-            self.out.fillBranch("Flag_badMuonFilter"                       + self.label ,event.Flag_BadPFMuonFilter                    )
+        self.out.fillBranch('Flag_HBHENoiseFilter'                     + self.label ,event.Flag_HBHENoiseFilter                    )
+        self.out.fillBranch('Flag_HBHENoiseIsoFilter'                  + self.label ,event.Flag_HBHENoiseIsoFilter                 )
+        self.out.fillBranch('Flag_EcalDeadCellTriggerPrimitiveFilter'  + self.label ,event.Flag_EcalDeadCellTriggerPrimitiveFilter )
+        self.out.fillBranch('Flag_goodVertices'                        + self.label ,event.Flag_goodVertices                       )
+        self.out.fillBranch('Flag_eeBadScFilter'                       + self.label ,event.Flag_eeBadScFilter                      )
+        self.out.fillBranch('Flag_ecalBadCalibFilter'                  + self.label ,event.Flag_ecalBadCalibFilter                 )
+        self.out.fillBranch('Flag_globalTightHalo2016Filter'           + self.label ,event.Flag_globalTightHalo2016Filter          )
+        self.out.fillBranch('Flag_badMuonFilter'                       + self.label ,event.Flag_BadPFMuonFilter                    )
+        self.out.fillBranch("Flag_badChargedHadronFilter"              + self.label ,event.Flag_BadChargedCandidateFilter          )
+        self.out.fillBranch("Flag_badMuonFilter"                       + self.label ,event.Flag_BadPFMuonFilter                    )
         
         ################### Isotracks stuff
         self.out.fillBranch('nPFLep5'  + self.label, event.nPFLep5 )       
