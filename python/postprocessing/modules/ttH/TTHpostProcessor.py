@@ -10,7 +10,6 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import *
 
 import json
 
-raw_input('Warning, no skim is applied')
 
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import *
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.collectionMerger import collectionMerger
@@ -32,41 +31,74 @@ inputSlim  = os.environ['CMSSW_BASE']+"/python/PhysicsTools/NanoAODTools/postpro
 
 
 doData=getCrabOption("doData",False)
+doYear=getCrabOption("doYear",0)
 
 
 if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
 
-    from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import * 
 
 
     print '[TTHpostProcessor]: Submission step'
-    from PhysicsTools.NanoAODTools.postprocessing.datasets.mc2017    import samples as mcSamples
-    from PhysicsTools.NanoAODTools.postprocessing.datasets.data2017  import samples as dataSamples
 
+    from PhysicsTools.NanoAODTools.postprocessing.datasets.mc2016    import samples as mcSamples2016
+    from PhysicsTools.NanoAODTools.postprocessing.datasets.data2016  import samples as dataSamples2016
+    from PhysicsTools.NanoAODTools.postprocessing.datasets.mc2017    import samples as mcSamples2017
+    from PhysicsTools.NanoAODTools.postprocessing.datasets.data2017  import samples as dataSamples2017
+    from PhysicsTools.NanoAODTools.postprocessing.datasets.mc2018    import samples as mcSamples2018
+    from PhysicsTools.NanoAODTools.postprocessing.datasets.data2018  import samples as dataSamples2018
+    
+    mcSamples   = eval('mcSamples%d'%doYear)
+    dataSamples = eval('dataSamples%d'%doYear)
     
     if doData:
-        jsonFile='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
+
+        from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2016 import triggers2016
+        from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import triggers2017
+        from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2018 import triggers2018
+
+        
         
         selectedSamples = dataSamples
-
         DatasetsAndTriggersMap = {}; DatasetsAndVetosMap = {} 
-        DatasetsAndTriggersMap["DoubleMuon"     ] = triggers_mumu_iso + triggers_3mu
-        DatasetsAndTriggersMap["DoubleEG"       ] = triggers_ee + triggers_3e + triggers_ee_noniso
-        DatasetsAndTriggersMap["MuonEG"         ] = triggers_mue + triggers_2mu1e + triggers_2e1mu + triggers_mue_noiso
-        DatasetsAndTriggersMap["SingleMuon"     ] = triggers_1mu_iso
-        DatasetsAndTriggersMap["SingleElectron" ] = triggers_1e_iso
-        DatasetsAndTriggersMap["MET" ] = []
-        DatasetsAndTriggersMap["Electron_noOverlapRemov"] = [] 
         
-        DatasetsAndVetosMap["DoubleMuon"    ] = []
-        DatasetsAndVetosMap["DoubleEG"      ] = DatasetsAndTriggersMap["DoubleMuon"] + DatasetsAndVetosMap["DoubleMuon"] 
-        DatasetsAndVetosMap["MuonEG"        ] = DatasetsAndTriggersMap["DoubleEG"  ] + DatasetsAndVetosMap["DoubleEG"  ] 
-        DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["MuonEG"    ] + DatasetsAndVetosMap["MuonEG"    ] 
-        DatasetsAndVetosMap["SingleElectron"] = DatasetsAndTriggersMap["SingleMuon"] + DatasetsAndVetosMap["SingleMuon"] 
-        DatasetsAndVetosMap["MET"] = [] 
-        DatasetsAndVetosMap["Electron_noOverlapRemov"] = [] 
+        DatasetsAndTriggersMap = {}; DatasetsAndVetosMap = {} 
+
+        yeartriggers = eval('triggers%d'%doYear)
+
+        if doYear in [2016, 2017]:
+            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
+            DatasetsAndTriggersMap["DoubleEG"       ] = yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso']
+            DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso']
+            DatasetsAndTriggersMap["SingleMuon"     ] = yeartriggers['triggers_1mu_iso']
+            DatasetsAndTriggersMap["SingleElectron" ] = yeartriggers['triggers_1e_iso']
+            DatasetsAndTriggersMap["MET" ] = []
+        
+            DatasetsAndVetosMap["DoubleMuon"    ] = []
+            DatasetsAndVetosMap["DoubleEG"      ] = DatasetsAndTriggersMap["DoubleMuon"] + DatasetsAndVetosMap["DoubleMuon"] 
+            DatasetsAndVetosMap["MuonEG"        ] = DatasetsAndTriggersMap["DoubleEG"  ] + DatasetsAndVetosMap["DoubleEG"  ] 
+            DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["MuonEG"    ] + DatasetsAndVetosMap["MuonEG"    ] 
+            DatasetsAndVetosMap["SingleElectron"] = DatasetsAndTriggersMap["SingleMuon"] + DatasetsAndVetosMap["SingleMuon"] 
+            DatasetsAndVetosMap["MET"] = [] 
+        
+        else: 
+            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
+            DatasetsAndTriggersMap["EGamma"         ] = yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso'] + yeartriggers['triggers_1e_iso']
+            DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso']
+            DatasetsAndTriggersMap["SingleMuon"     ] = yeartriggers['triggers_1mu_iso']
+            DatasetsAndTriggersMap["MET" ] = []
+        
+            DatasetsAndVetosMap["DoubleMuon"    ] = []
+            DatasetsAndVetosMap["EGamma"        ] = DatasetsAndTriggersMap["DoubleMuon"] + DatasetsAndVetosMap["DoubleMuon"] 
+            DatasetsAndVetosMap["MuonEG"        ] = DatasetsAndTriggersMap["EGamma"    ] + DatasetsAndVetosMap["EGamma"  ] 
+            DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["MuonEG"    ] + DatasetsAndVetosMap["MuonEG"    ] 
+            DatasetsAndVetosMap["MET"] = [] 
+            
     
         for sample in selectedSamples:
+            if   doYear == 2016: jsonFile='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
+            elif doYear == 2017: jsonFile='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
+            elif doYear == 2018: jsonFile='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt'
+
             jsn = open( jsonFile ,'r')
             sample.options['json'] = json.loads ( jsn.read())
             sample.options['isData'] = True
@@ -107,14 +139,12 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     def preselectMuon(lep):
         return lep.pt > 5 and abs(lep.eta) < 2.4 and abs(lep.dxy) < 0.05 and abs(lep.dz) < 0.1 and lep.miniPFRelIso_all < 0.4 and lep.sip3d < 8
 
-    def preselectElectron(lep, year):
-        if year == 2016: return lep.pt > 7 and abs(lep.eta) < 2.5 and abs(lep.dxy) < 0.05 and abs(lep.dz) < 0.1 and lep.miniPFRelIso_all < 0.4  and lep.sip3d < 8 and lep.mvaSpring16HZZ_WPL and lep.lostHits <=1
-        elif year == 2017: return lep.pt > 7 and abs(lep.eta) < 2.5 and abs(lep.dxy) < 0.05 and abs(lep.dz) < 0.1 and lep.miniPFRelIso_all < 0.4  and lep.sip3d < 8 and lep.mvaFall17V1noIso_WPL and lep.lostHits <=1
-        else: raise RuntimeError("Year %d not supported"%year) 
+    def preselectElectron(lep):
+        return lep.pt > 7 and abs(lep.eta) < 2.5 and abs(lep.dxy) < 0.05 and abs(lep.dz) < 0.1 and lep.miniPFRelIso_all < 0.4  and lep.sip3d < 8 and lep.mvaFall17V2noIso_WPL and lep.lostHits <=1
         
 
     def preselectLepton(lep, year):
-        return preselectElectron(lep) if abs(lep.pdgId, year) == 11 else preselectMuon(lep)
+        return preselectElectron(lep) if abs(lep.pdgId) == 11 else preselectMuon(lep)
     
     def clean_and_FO_selection_TTH(lep):
         return lep.conept>10 and lep.jetBTagDeepCSV<0.4941 and (abs(lep.pdgId)!=11 or (_ttH_idEmu_cuts_E3(lep) and lep.convVeto and lep.lostHits==0)\
@@ -126,6 +156,7 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
 
     def _bitFromInt(num, idx):
         # returns the bit in the idx's position of num
+        #return num & 1 << idx != 0
         bitMap = "{0:b}".format(num)
         if idx > len(bitMap): return False
         return bool(int(bitMap[-idx]))
@@ -138,49 +169,78 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         if (abs(lep.pdgId)!=13 or lep.mediumId>0) and lep.mvaTTH > 0.90: return lep.pt
         else: return 0.90 * lep.pt * (1+lep.jetRelIso)
 
-    def jetSel(jet):
+    def jetSel(jet,year):
         if jet.pt < 15      : return False
         if abs(jet.eta) > 5 : return False
-        if not _bitFromInt(jet.jetId,2): return False
-        if abs(jet.eta) < 3 and abs(jet.eta) > 2.7 and jet.pt < 60: return False
+        # Tight ID for 2017 and 2018
+        if year in [2017,2018]:
+            ID = 2 
+        # Loose ID for 2016
+        elif year == 2016: 
+            ID = 1
+        else: raise RuntimeError("Unsupported year", year)
+        if not _bitFromInt(jet.jetId, ID ): return False
+        #if abs(jet.eta) < 3 and abs(jet.eta) > 2.7 and jet.pt < 60: return False # do not apply this for the moment to account for jet uncert. 
         return True
                                   
-    puAutoWeight     = puAutoWeight()
     
     from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
 
     mod = [] 
     addFlags = AddFlags([(('isData','F'), lambda ev : sampOpt['isData'] ),
-                         (('year','i')  , lambda ev : sampOpt['year'] ),
+                         (('year','i')  , lambda ev : int(sampOpt['year']) ),
                      ])
 
     if not sampOpt['isData']:
         # add pile-up weight before any skim
+        if sampOpt['year'] == '2017':
+            puAutoWeight     = puAutoWeight()
+        elif sampOpt['year'] == '2018':
+            puAutoWeight = puAutoWeight2018()
+        elif sampOpt['year'] == '2016':
+            puAutoWeight  = puWeight()
         mod = [puAutoWeight] + mod
-        
+
         ## add jet met uncertainties
-        from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017All, jetmetUncertainties2017
-        jmeUncert = jetmetUncertainties2017()
-        jmeUncert.metBranchName = 'METFixEE2017' if sampOpt['year'] == '2017' else 'MET'
-        mod.extend([jmeUncert]) # jetmetUncertainties2017All()
+        if sampOpt['year'] == '2017':
+            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017 as jetmetUncertainties
+            jmeUncert = jetmetUncertainties()
+            jmeUncert.metBranchName = 'METFixEE2017' 
+        elif sampOpt['year'] == '2018':
+            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2018 as jetmetUncertainties
+            jmeUncert = jetmetUncertainties()
+        elif sampOpt['year'] == '2016': 
+            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2016 as jetmetUncertainties
+            jmeUncert = jetmetUncertainties()
+
+        mod.extend([jmeUncert]) 
     
         ## add xsec branch
         addFlags.flags.append(  (('xsec','F'), lambda ev : sampOpt['xsec'] ))
                    
     mod.append(addFlags)
 
+    if sampOpt['isData']:
+        if sampOpt['year'] == '2018': # applying jecs on top of 2018 
+            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import jetRecalib2018A, jetRecalib2018B, jetRecalib2018C, jetRecalib2018D
+            if 'Run2018A' in sampOpt['name']:
+                jmeUncert = jetRecalib2018A()
+            elif 'Run2018B' in sampOpt['name']:
+                jmeUncert = jetRecalib2018B()
+            elif 'Run2018C' in sampOpt['name']:
+                jmeUncert = jetRecalib2018C()
+            elif 'Run2018D' in sampOpt['name']:
+                jmeUncert = jetRecalib2018D()
+            else: raise RuntimeError('I dont know the era for sample %s'%sampOpt['name'])
+
+            mod.extend([jmeUncert])
+
     # cleaning must come after jecs. otherwise variations are not stored in selected jets...
     objCleaning = ObjectCleaning( looseLeptonSelection = lambda x : preselectLepton(x, int(sampOpt['year'])),
                                   FOLeptonSelection    = lambda x : clean_and_FO_selection_TTH(x),
                                   FOTauSelection       = lambda x : _FOTauSel(x),
-                                  jetSelection         = lambda jet: jetSel(jet),
+                                  jetSelection         = lambda jet: jetSel(jet, int(sampOpt['year'])),
                                   conePt               = lambda x : conept_TTH(x),
-                                  jetPts=[25,40],
-                                  jetSel={ "JetCentral" : lambda x : abs(x.eta) < 2.4,
-                                           "JetForward" : lambda x : abs(x.eta) > 2.4 } ,
-                                  btagL_thr=0.1522,
-                                  btagM_thr=0.4941,
-                                  doJetSums=True,
                                   )
 
     mod.append( objCleaning )

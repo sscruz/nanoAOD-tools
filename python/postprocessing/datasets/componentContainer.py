@@ -6,3 +6,4 @@ class ComponentContainer:
         self.dataset      = dataset  
         self.options      = {} 
         self.options['xsec'] = xsec
+        self.options['name'] = name

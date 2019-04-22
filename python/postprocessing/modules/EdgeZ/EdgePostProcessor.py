@@ -39,6 +39,7 @@ edgeFriends = edgeFriends("Edge", lambda lep : _susyEdgeTight(lep),
                           cleanJet = lambda lep,jet,dr : (jet.pt < 35 and dr < 0.4))
 
 from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import * 
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.addFlags import AddFlags
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import getCrabOption
 
@@ -113,6 +114,10 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
 
     skimRecoLeps     = SkimRecoLeps(sampOpt['isData'] == True, nMinLeps=2)
     mod = [puAutoWeight,  goodLepProducer, skimRecoLeps, isoTrackAnalysis, edgeFriends]
+    addFlags = AddFlags([(('isData','F'), lambda ev : sampOpt['isData'] ),
+                         (('year','i')  , lambda ev : sampOpt['year'] ),
+                     ])
+
     if sampOpt['isData']: 
         mod.remove( puAutoWeight ) 
     else:
@@ -122,6 +127,9 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         jmeUncertAK8 = jetmetUncertainties2017AK8chs()
         mod.insert(mod.index(edgeFriends ),jmeUncertAK4)
         mod.insert(mod.index(jmeUncertAK4),jmeUncertAK8)
+        addFlags.flags.append(  (('xsec','F'), lambda ev : sampOpt['xsec'] ))
+                   
+    mod.append(addFlags)
 
     if 'triggers' in sampOpt:
         if not 'vetotriggers' in sampOpt:

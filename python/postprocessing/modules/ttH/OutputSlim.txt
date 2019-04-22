@@ -16,9 +16,11 @@ drop SV*
 drop Muon*
 drop Electron*
 drop IsoTrack*
+drop Tau*
+drop Jet*
+keep SelJet*
 
 # keep leptons
-keep LepGood*
 
 # Select these trigger paths:
 drop HLT_*

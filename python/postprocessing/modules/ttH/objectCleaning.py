@@ -22,8 +22,6 @@ class ObjectCleaning(Module):
                  conePt                    ,
                  jetPts                    = [],
                  jetSel                    = {},
-                 btagL_thr                 = 0,
-                 btagM_thr                 = 0,
                  doJetSums                 = False,
                  cleanElectronsWithMuons   = 0.3,
                  cleanTausWithLooseLeptons = 0.3,
@@ -39,13 +37,11 @@ class ObjectCleaning(Module):
         self.cleanJetsWithFOLeps       = cleanJetsWithFOLeps      
         self.cleanJetsWithFOTaus       = cleanJetsWithFOTaus      
         self.conePt                    = conePt
-        self.jetSel                    = jetSel
-        self.btagL_thr                 = btagL_thr
-        self.btagM_thr                 = btagM_thr
-        self.doJetSums                 = doJetSums
-        self.jetPts                    = jetPts
+        #self.jetSel                    = jetSel
+        #self.doJetSums                 = doJetSums
+        #self.jetPts                    = jetPts
 
-        self.systsJEC = {0:""  , 1:"_jesTotalUp", -1:"_jesTotalDown"}
+        self.systsJEC = {0:"_nom"  , 1:"_jesTotalUp", -1:"_jesTotalDown"}
 
         #self._helper_muonFO    = CollectionSkimmer("MuonFO","Muon", maxSize=20)
         #self._helper_elecFO    = CollectionSkimmer("ElecFO","Electron", maxSize=20)
@@ -124,15 +120,13 @@ class ObjectCleaning(Module):
         self.out.branch('LepLoose_jetBTagDeepCSV','F', lenVar="nLepLoose")
 
 
-        for pt in self.jetPts:
-            for var in self.systsJEC:
-                for sel in self.jetSel:
-                    self.out.branch( 'n%s%d'%(sel, int(pt))           + self.systsJEC[var], 'i')
-                    self.out.branch( 'nB%sMedium%d'%(sel, int(pt)) + self.systsJEC[var]   , 'i')
-                    self.out.branch( 'nB%sLoose%d'%(sel, int(pt))  + self.systsJEC[var]   , 'i')
-                if self.doJetSums:
-                    self.out.branch( 'ht%d'%(int(pt))  + self.systsJEC[var] ,'F')
-                    self.out.branch( 'mht%d'%(int(pt))  + self.systsJEC[var],'F')
+        # for pt in self.jetPts:
+        #     for var in self.systsJEC:
+        #         for sel in self.jetSel:
+        #             self.out.branch( 'n%s%d'%(sel, int(pt))           + self.systsJEC[var], 'i')
+        #         if self.doJetSums:
+        #             self.out.branch( 'ht%d'%(int(pt))  + self.systsJEC[var] ,'F')
+        #             self.out.branch( 'mht%d'%(int(pt))  + self.systsJEC[var],'F')
 
                 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -163,7 +157,9 @@ class ObjectCleaning(Module):
             setattr(lep, 'conept', self.conePt(lep))
             setattr(lep, 'jetBTagDeepCSV', 0 if lep.jetIdx < 0 else jets[lep.jetIdx].btagDeepB)
 
-
+        for jet in jets:
+            if not hasattr(jet,'pt_nom'): 
+                setattr(jet, 'pt_nom',jet.pt)
 
 
         
@@ -172,8 +168,9 @@ class ObjectCleaning(Module):
             toRemove_elecLoose = [] 
             for el in elecLoose:
                 for mu in muonLoose:
-                    if deltaR(el,mu) < self.cleanElectronsWithMuons: toRemove_elecLoose.append(el)
-                    break # breaking just in case three leptons are quite close
+                    if deltaR(el,mu) < self.cleanElectronsWithMuons: 
+                        toRemove_elecLoose.append(el)
+                        break # breaking just in case three leptons are quite close
             for el in toRemove_elecLoose: elecLoose.remove(el)
 
 
@@ -183,7 +180,7 @@ class ObjectCleaning(Module):
         tausFO    = filter(self.FOTauSelection,    taus)
         jetsSelec = filter(self.jetSelection,   jets)
 
-        #if len(muonFO)+len(elecFO) < 2: return False
+        if len(muonFO)+len(elecFO) < 2: return False
 
         # we clean taus from loose leptons
         toRemove_tausFO = [] 
@@ -240,8 +237,9 @@ class ObjectCleaning(Module):
 
         # for x in lepFO_idx    : self._helper_lepFO   ._impl.push_back(x[2],x[0])
         # for x in lepLoose_idx : self._helper_lepLoose._impl.push_back(x[2],x[0])
+        
 
-
+        jetsSelec.sort(key = lambda x : x.pt_nom, reverse=True)
         for branch in self.jetBranches:
             out = [] 
             branchName = branch[0]
@@ -279,47 +277,42 @@ class ObjectCleaning(Module):
 
 
         
-        if self.doJetSums:
-            _mht  = {}; _ht = {}
-            for pt in self.jetPts:
-                for var in self.systsJEC:
-                    _mht['%s%d'%(var,int(pt))] = ROOT.TLorentzVector()
-                    _ht ['%s%d'%(var,int(pt))] = 0
-                    for l in lepFO+tausFO:
-                        vl = ROOT.TLorentzVector(); vl.SetPtEtaPhiM( l.pt, 0, l.phi, 0)
-                        _mht['%s%d'%(var,int(pt))] = _mht['%s%d'%(var,int(pt))] - vl
-                        _ht ['%s%d'%(var,int(pt))] = _ht ['%s%d'%(var,int(pt))] + l.pt
+        # if self.doJetSums:
+        #     _mht  = {}; _ht = {}
+        #     for pt in self.jetPts:
+        #         for var in self.systsJEC:
+        #             _mht['%s%d'%(var,int(pt))] = ROOT.TLorentzVector()
+        #             _ht ['%s%d'%(var,int(pt))] = 0
+        #             for l in lepFO+tausFO:
+        #                 vl = ROOT.TLorentzVector(); vl.SetPtEtaPhiM( l.pt, 0, l.phi, 0)
+        #                 _mht['%s%d'%(var,int(pt))] = _mht['%s%d'%(var,int(pt))] - vl
+        #                 _ht ['%s%d'%(var,int(pt))] = _ht ['%s%d'%(var,int(pt))] + l.pt
 
 
-        allret = {} 
-        for pt in self.jetPts:
-            for var in self.systsJEC:
-                for sel in self.jetSel:
-                    namJ = 'n%s%d'%(sel, int(pt)) + self.systsJEC[var]       ;  allret[namJ] = 0
-                    namb = 'nB%sLoose%d'%(sel, int(pt)) + self.systsJEC[var] ;  allret[namb] = 0
-                    namB = 'nB%sMedium%d'%(sel, int(pt)) + self.systsJEC[var];  allret[namB] = 0
+        # allret = {} 
+        # for pt in self.jetPts:
+        #     for var in self.systsJEC:
+        #         for sel in self.jetSel:
+        #             namJ = 'n%s%d'%(sel, int(pt)) + self.systsJEC[var]       ;  allret[namJ] = 0
                     
 
-        for pt in self.jetPts:
-            for var in self.systsJEC:
-                for jet in jetsSelec:
-                    for sel in self.jetSel:
-                        if not self.jetSel[sel](jet): continue
-                        if hasattr(jet, 'pt%s'%self.systsJEC[var]) and getattr(jet,'pt%s'%self.systsJEC[var]) > pt:
-                            namJ = 'n%s%d'%(sel, int(pt)) + self.systsJEC[var]
-                            namb = 'nB%sLoose%d'%(sel, int(pt)) + self.systsJEC[var]
-                            namB = 'nB%sMedium%d'%(sel, int(pt)) + self.systsJEC[var]
-                            allret[namJ] = allret[namJ] + 1
-                            if jet.btagDeepB > self.btagL_thr: allret[namb] = allret[namb] + 1
-                            if jet.btagDeepB > self.btagM_thr: allret[namB] = allret[namB] + 1
-                    vj = ROOT.TLorentzVector(); vj.SetPtEtaPhiM( jet.pt, 0, jet.phi, 0)
-                    _mht['%s%d'%(var,int(pt))] = _mht['%s%d'%(var,int(pt))] - vj
-                    _ht ['%s%d'%(var,int(pt))] = _ht ['%s%d'%(var,int(pt))] + jet.pt
-                allret['ht%d'%(int(pt))  + self.systsJEC[var]]  = _ht ['%s%d'%(var,int(pt))]
-                allret['mht%d'%(int(pt))  + self.systsJEC[var]] = _mht['%s%d'%(var,int(pt))].Pt()
+        # for pt in self.jetPts:
+        #     for var in self.systsJEC:
+        #         for jet in jetsSelec:
+        #             for sel in self.jetSel:
+        #                 if not self.jetSel[sel](jet): continue
+        #                 if hasattr(jet, 'pt%s'%self.systsJEC[var]) and getattr(jet,'pt%s'%self.systsJEC[var]) > pt:
+        #                     namJ = 'n%s%d'%(sel, int(pt)) + self.systsJEC[var]
+        #                     allret[namJ] = allret[namJ] + 1
+        #                     vj = ROOT.TLorentzVector(); vj.SetPtEtaPhiM( jet.pt, 0, jet.phi, 0)
+        #                     if abs(jet.eta) > 2.4: continue
+        #                     _mht['%s%d'%(var,int(pt))] = _mht['%s%d'%(var,int(pt))] - vj
+        #                     _ht ['%s%d'%(var,int(pt))] = _ht ['%s%d'%(var,int(pt))] + jet.pt
+        #         allret['ht%d'%(int(pt))  + self.systsJEC[var]]  = _ht ['%s%d'%(var,int(pt))]
+        #         allret['mht%d'%(int(pt))  + self.systsJEC[var]] = _mht['%s%d'%(var,int(pt))].Pt()
        
-        for key, val in allret.iteritems():
-            self.out.fillBranch(key, val)
+        # for key, val in allret.iteritems():
+        #     self.out.fillBranch(key, val)
                     
 
         return True

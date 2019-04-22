@@ -28,13 +28,6 @@ DoubleMuon=[
     ComponentContainer('DoubleMuon_Run2018D', '/DoubleMuon/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD'),
     ComponentContainer('DoubleMuon_Run2018A', '/DoubleMuon/Run2018A-Nano14Dec2018-v1/NANOAOD'),
     ]
-""" #No longer in 2018!
-DoubleElectron=[
-    ComponentContainer('DoubleEG_Run2018B', '/DoubleEG/Run2018B-Nano14Dec2018-v1/NANOAOD'), 
-    ComponentContainer('DoubleEG_Run2018C', '/DoubleEG/Run2018C-Nano14Dec2018-v1/NANOAOD'), 
-    ComponentContainer('DoubleEG_Run2018D', '/DoubleEG/Run2018D-Nano14Dec2018_ver2-v1/NANOAOD'), 
-    ComponentContainer('DoubleEG_Run2018A', '/DoubleEG/Run2018A-Nano14Dec2018-v1/NANOAOD'), 
-]"""
 
 MET=[
     ComponentContainer('MET_Run2018B', '/MET/Run2018B-Nano14Dec2018-v1/NANOAOD'), 
@@ -44,7 +37,9 @@ MET=[
 ]
 
 
-samples = SingleMuon+EGamma+MuonEG+DoubleMuon+MET #DoubleElectron
+samples = SingleMuon+EGamma+MuonEG+DoubleMuon+MET 
 
 for sample in samples:
     sample.options['isData'] = True
+    sample.options['year']   = '2018'
+    sample.name = sample.name + '_2018'
