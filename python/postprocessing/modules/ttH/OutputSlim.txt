@@ -1,5 +1,3 @@
-drop LHE*
-
 drop CaloMET*
 drop GenJetAK8*
 drop GenVisTau*
@@ -24,39 +22,8 @@ keep SelJet*
 
 # Select these trigger paths:
 drop HLT_*
-keep HLT_*SingleEl*
-keep HLT_*Ele32*
-keep HLT_*Ele35*
-keep HLT_*Ele115*
-keep HLT_*Ele12*
-keep HLT_*Ele23*
-keep HLT_*Ele16*
-keep HLT_*Ele24*
-keep HLT_*SingleMu*
-keep HLT_*TrkMu12*
-keep HLT_*IsoMu27*
-keep HLT_*IsoMu20*
-keep HLT_*IsoMu24*
-keep HLT_*Mu23*
-keep HLT_*Mu17*
-keep HLT_*Mu8*
-keep HLT_*Mu19*
-keep HLT_*Mu9*
-keep HLT_*Mu37*
-keep HLT_*DiMu9*
-keep HLT_*DoubleMu*
-keep HLT_*DoubleEl*
-keep HLT_*DoubleEle8*
-keep HLT_*DoubleElHT*
-keep HLT_*DiEle12*
-keep HLT_*MuEGHT*
-keep HLT_*DoubleMuEl*
-keep HLT_*DoubleElMu*
-keep HLT_*MuEG*
-keep HLT_*LepTau*
-keep HLT_*TripleEl*
-keep HLT_*TripleMu*
-keep HLT_*SameSign*
-keep HLT_*DoubleMuSS*
+keep HLT_*Ele*
+keep HLT_*Mu*
 keep HLT_*MET*
 keep xsec
+keep year
