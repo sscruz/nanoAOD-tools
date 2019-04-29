@@ -56,7 +56,7 @@ MET = [
 
 
 samples = SingleMuon+SingleElectron+MuonEG+DoubleMuon+DoubleElectron+MET
-samples  = filter( lambda x : '2016G' in x.name, samples)
+
 for sample in samples:
     sample.options['isData'] = True
     sample.options['year']   = '2016'
