@@ -180,7 +180,7 @@ class ObjectCleaning(Module):
         tausFO    = filter(self.FOTauSelection,    taus)
         jetsSelec = filter(self.jetSelection,   jets)
 
-        if len(muonFO)+len(elecFO) < 2: return False
+        #if len(muonFO)+len(elecFO) < 2: return False
 
         # we clean taus from loose leptons
         toRemove_tausFO = [] 
@@ -198,8 +198,8 @@ class ObjectCleaning(Module):
             for tau in tausFO:
                 if tau.jetIdx > -1 and jets[tau.jetIdx] in jetsSelec:
                     toRemove_jetsSelec.append( jets[tau.jetIdx] ) 
-                    break
-        for jet in toRemove_jetsSelec: jetsSelec.remove(jet)
+        for jet in toRemove_jetsSelec: 
+            if jet in jetsSelec: jetsSelec.remove(jet)
 
         # we clean jets from FO taus and leps. Here no deltaR but using the matching
         toRemove_jetsSelec = []
