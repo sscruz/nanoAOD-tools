@@ -1,10 +1,10 @@
 from PhysicsTools.NanoAODTools.postprocessing.datasets.componentContainer import  ComponentContainer
 
-TTJets_SingleLeptonFromT = ComponentContainer('TTJets_SingleLeptonFromT','/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/NANOAODSIM', 2*831.76*(3*0.108)*(1-3*0.108) )
-TTJets_SingleLeptonFromT_ext1 = ComponentContainer('TTJets_SingleLeptonFromT','/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/NANOAODSIM', 2*831.76*(3*0.108)*(1-3*0.108) )
+TTJets_SingleLeptonFromT = ComponentContainer('TTJets_SingleLeptonFromT','/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/NANOAODSIM', 831.76*(3*0.108)*(1-3*0.108) )
+TTJets_SingleLeptonFromT_ext1 = ComponentContainer('TTJets_SingleLeptonFromT_ext1','/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/NANOAODSIM', 831.76*(3*0.108)*(1-3*0.108) )
 
 TTJets_SingleLeptonFromTbar = ComponentContainer("TTJets_SingleLeptonFromTbar","/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/NANOAODSIM", 831.76*(3*0.108)*(1-3*0.108))
-TTJets_SingleLeptonFromTbar_ext1 = ComponentContainer("TTJets_SingleLeptonFromTbar","/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/NANOAODSIM", 831.76*(3*0.108)*(1-3*0.108))
+TTJets_SingleLeptonFromTbar_ext1 = ComponentContainer("TTJets_SingleLeptonFromTbar_ext1","/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/NANOAODSIM", 831.76*(3*0.108)*(1-3*0.108))
 
 
 TTJets_DiLepton     = ComponentContainer("TTJets_DiLepton","/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/NANOAODSIM",831.76*((3*0.108)**2))
@@ -19,6 +19,10 @@ DYJetsToLL_M10to50_LO = ComponentContainer("DYJetsToLL_M10to50_LO","/DYJetsToLL_
 
 DYJetsToLL_M50_LO_ext = ComponentContainer("DYJetsToLL_M50_LO_ext","/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/NANOAODSIM",2008.*3)
 DYJetsToLL_M50_LO_ext2 = ComponentContainer("DYJetsToLL_M50_LO_ext2","/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext2-v1/NANOAODSIM",2008.*3)
+
+DYJetsToLL_M50 = ComponentContainer("DYJetsToLL_M50","/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext2-v1/NANOAODSIM",2008.*3)
+DYJetsToLL_M10to50     = ComponentContainer("DYJetsToLL_M10to50","/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/NANOAODSIM",18610)
+DYJetsToLL_M10to50_ext = ComponentContainer("DYJetsToLL_M10to50_ext","/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6_ext1-v1/NANOAODSIM",18610)
 
 
 WJetsToLNu_LO = ComponentContainer("WJetsToLNu_LO","/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv4-PUMoriond17_Nano14Dec2018_102X_mcRun2_asymptotic_v6-v1/NANOAODSIM",3* 20508.9)
