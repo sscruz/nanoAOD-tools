@@ -51,7 +51,7 @@ class IsoTrackAnalysis(Module):
         ## Leptons
         for cand in muon+elec: 
             if not cand.isPFcand: continue
-            if abs(cand.pdgId) == 11: pt = cand.pt / cand.eCorr
+            if abs(cand.pdgId) == 11: pt = cand.pt / cand.eCorr if hasattr(cand,'eCorr') else cand.pt
             else: pt = cand.pt
             if pt < 5 or abs(cand.eta) > 2.4: continue
             if abs(cand.dz)  > 0.1: continue

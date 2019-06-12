@@ -46,10 +46,10 @@ DY_M50_ext =  ComponentContainer('DYJetsToLL_M50_ext','/DYJetsToLL_M-50_TuneCP5_
 
 #DY_M50_HT70_100  = ComponentContainer('DYJetsToLL_M50_HT70To100', '/DYJetsToLL_M-50_HT-70to100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM',0)
 # print we are missing xsec here 
-DY_M50_HT100_200 = ComponentContainer('DYJetsToLL_M50_HT100to200', '/DYJetsToLL_M-50_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM',161.1*1.08)
-DY_M50_HT200_400 = ComponentContainer('DYJetsToLL_M50_HT200to400', '/DYJetsToLL_M-50_HT-200to400_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM',49.32*1.08)
-DY_M50_HT400_600 = ComponentContainer('DYJetsToLL_M50_HT400to600', '/DYJetsToLL_M-50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM',7.021*1.08)
-DY_M50_HT600_800 = ComponentContainer('DYJetsToLL_M50_HT600to800','/DYJetsToLL_M-50_HT-600to800_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM',1.743*1.08 )
+DYJetsToLL_M50_HT100_200 = ComponentContainer('DYJetsToLL_M50_HT100to200', '/DYJetsToLL_M-50_HT-100to200_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM',1.23*147.40)
+DYJetsToLL_M50_HT200_400 = ComponentContainer('DYJetsToLL_M50_HT200to400', '/DYJetsToLL_M-50_HT-200to400_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM',1.23*40.99)
+DYJetsToLL_M50_HT400_600 = ComponentContainer('DYJetsToLL_M50_HT400to600', '/DYJetsToLL_M-50_HT-400to600_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM',1.23*5.678)
+DYJetsToLL_M50_HT600_800 = ComponentContainer('DYJetsToLL_M50_HT600to800','/DYJetsToLL_M-50_HT-600to800_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_new_pmx_102X_mc2017_realistic_v6-v1/NANOAODSIM',1.23*1.367)
 # print 800to1200 1200to2500 2500toinf missing
 
 #DY_0Jets  = ComponentContainer('DYJetsToLL_M50_0J', '/DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM',0)
@@ -82,7 +82,7 @@ DYJetsToLLM4to50HT = [
 ]
 
 
-V = [DY_M50, DY_M10to50, DY_M50_ext, DY_M50_HT100_200, DY_M50_HT200_400,  DY_M50_HT400_600,  DY_M50_HT600_800,  DY_1Jets, DY_2Jets,  WJets, W1Jet, W2Jet, W3Jet, W4Jet]+DYJetsToLLM4to50HT
+V = [DY_M50, DY_M10to50, DY_M50_ext, DYJetsToLL_M50_HT100_200, DYJetsToLL_M50_HT200_400,  DYJetsToLL_M50_HT400_600,  DYJetsToLL_M50_HT600_800,  DY_1Jets, DY_2Jets,  WJets, W1Jet, W2Jet, W3Jet, W4Jet]+DYJetsToLLM4to50HT
 
 
 TTWToLNu        = ComponentContainer("TTWToLNu","/TTWJetsToLNu_TuneCP5_PSweights_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17NanoAODv4-PU2017_12Apr2018_Nano14Dec2018_102X_mc2017_realistic_v6-v1/NANOAODSIM",0.2043)

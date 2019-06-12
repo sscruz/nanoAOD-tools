@@ -57,7 +57,6 @@ cfo = imp.load_source(options.cfg_file.split('/')[-1].rstrip('.py'), options.cfg
 #    os.environ["LUMIJSON"] = cfo.jsonFile
 
 for dataset in cfo.selectedSamples:
-    print dataset
     os.environ["DATASET_NAME"] = str(dataset.name)
     os.environ["DATASET"] = str(dataset.dataset)
     

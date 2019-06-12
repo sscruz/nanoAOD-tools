@@ -34,44 +34,29 @@ def computeMT2(visaVec, visbVec, metVec):
 
 
 class edgeFriends:
-    def __init__(self, label, tightLeptonSel, cleanJet):
+    def __init__(self, label, tightLeptonSel, cleanJet, year):
         self.label = "" if (label in ["",None]) else ("_"+label)
-        self.tightLeptonSel = tightLeptonSel
         self.cleanJet = cleanJet
+        self.year     = year
         
-        ###################################### This variable is not defined
-        self.isMC = 1 # should be: isMC
-        
-        ###################################### Pile-up stuff should be included here
-        #self.setPU("Run2017") 
 
         ###################################### B-tagging stuff to be included here
-        vector = ROOT.vector('string')()
-        vector.push_back("up")
-        vector.push_back("down") 
-        self.calib = ROOT.BTagCalibration("csvv2",os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/CSVv2_94XSF_V1_B_F.csv")
-        self.reader_heavy = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
-        self.reader_heavy.load(self.calib, 0, "comb") #0 means b-jets
-        self.reader_c = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
-        self.reader_c.load(self.calib, 1, "comb") #0 means b-jets
-        self.reader_light = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
-        self.reader_light.load(self.calib, 2, "incl") #0 means b-jets
-        self.calibFASTSIM = ROOT.BTagCalibration("csvv2", os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/fastsim_csvv2_ttbar_26_1_2017.csv")
-        self.reader_heavy_FASTSIM = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
-        self.reader_heavy_FASTSIM.load(self.calibFASTSIM, 0, "fastsim") #0 means b-jets
-        self.reader_c_FASTSIM = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
-        self.reader_c_FASTSIM.load(self.calibFASTSIM, 1, "fastsim") #0 means b-jets
-        self.reader_light_FASTSIM = ROOT.BTagCalibrationReader(1, "central", vector) #1 means medium point
-        self.reader_light_FASTSIM.load(self.calibFASTSIM, 2, "fastsim") #0 means b-jets
-        self.f_btag_eff      = ROOT.TFile(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root")
-        self.h_btag_eff_b    = copy.deepcopy(self.f_btag_eff.Get("h2_BTaggingEff_csv_med_Eff_b"   ))
-        self.h_btag_eff_c    = copy.deepcopy(self.f_btag_eff.Get("h2_BTaggingEff_csv_med_Eff_c"   ))
-        self.h_btag_eff_udsg = copy.deepcopy(self.f_btag_eff.Get("h2_BTaggingEff_csv_med_Eff_udsg"))
+        self.f_btag_eff      = ROOT.TFile(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/btagEffs_Nanov4.root")
+        self.h_btag_eff_b    = copy.deepcopy(self.f_btag_eff.Get("h2_Eff_%d_btagDeepB_med_b"   %year))
+        self.h_btag_eff_c    = copy.deepcopy(self.f_btag_eff.Get("h2_Eff_%d_btagDeepB_med_c"   %year))
+        self.h_btag_eff_udsg = copy.deepcopy(self.f_btag_eff.Get("h2_Eff_%d_btagDeepB_med_udsg"%year))
         self.f_btag_eff.Close()
-        self.btagMediumCut =  0.4941 #DeepCSV
-        self.btagLooseCut  =  0.1522 #DeepCSV
 
-        ###################################### Scale factors for leptons
+        if self.year == 2016:
+            self.btagMediumCut =  0.6321
+            self.btagLooseCut  =  0.2217
+        elif self.year == 2017:
+            self.btagMediumCut =  0.4941
+            self.btagLooseCut  =  0.1522
+        elif self.year == 2018:
+            self.btagMediumCut =  0.4184
+            self.btagLooseCut  =  0.1241
+        else: raise RuntimeError('No year?')
 
 
 
@@ -83,32 +68,7 @@ class edgeFriends:
                              'GenSusyMChargino'  , 'GenSusyMChargino2']
         
         ###################################### List of triggers
-        self.triggerlist = [ 'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL',
-                             'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
-                             'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',
-                             'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ',
-                             'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL',
-                             'HLT_DoubleEle25_CaloIdL_MW',
-                             'HLT_DoubleEle27_CaloIdL_MW',
-                             'HLT_DoubleEle33_CaloIdL_MW',
-                             'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8',
-                             'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8',
-                             'HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass3p8',
-                             'HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass8',
-                             'HLT_Mu37_TkMu27',
-                             'HLT_PFHT180',
-                             'HLT_PFHT250',
-                             'HLT_PFHT370',
-                             'HLT_PFHT430',
-                             'HLT_PFHT510',
-                             'HLT_PFHT590',
-                             'HLT_PFHT680',
-                             'HLT_PFHT780',
-                             'HLT_PFHT890',
-                             'HLT_PFHT1050',
-                             'HLT_PFMET120_PFMHT120_IDTight',
-                             'HLT_PFMET120_PFMHT120_IDTight_PFHT60',
-                         ]
+
 
     def beginJob(self):
         pass
@@ -122,16 +82,16 @@ class edgeFriends:
                     ("lumi"+label, "I"),
                     ("nVert"+label, "I"),
                     ("nTrueInt"+label, "F"),
-                    ("Flag_HBHENoiseFilter"+label, "I"),
-                    ("Flag_HBHENoiseIsoFilter"+label, "I"),
-                    ("Flag_EcalDeadCellTriggerPrimitiveFilter"+label, "I"),
-                    ("Flag_goodVertices"+label, "I"),
-                    ("Flag_eeBadScFilter"+label, "I"),
-                    ("Flag_ecalBadCalibFilter"+label, "I"),
-                    ("Flag_globalTightHalo2016Filter"+label, "I"),
-                    ("Flag_globalSuperTightHalo2016Filter"+label, "I"),
-                    ("Flag_badChargedHadronFilter"+label, "F"),
-                    ("Flag_badMuonFilter"+label, "F"),
+                    ("Flag_HBHENoiseFilter"+label, "O"),
+                    ("Flag_HBHENoiseIsoFilter"+label, "O"),
+                    ("Flag_EcalDeadCellTriggerPrimitiveFilter"+label, "O"),
+                    ("Flag_goodVertices"+label, "O"),
+                    ("Flag_eeBadScFilter"+label, "O"),
+                    ("Flag_ecalBadCalibFilter"+label, "O"),
+                    ("Flag_globalTightHalo2016Filter"+label, "O"),
+                    ("Flag_globalSuperTightHalo2016Filter"+label, "O"),
+                    ("Flag_badChargedHadronFilter"+label, "O"),
+                    ("Flag_badMuonFilter"+label, "O"),
                     ("nLepTight"+label, "I"),
                     ("nLepLoose"+label, "I"),
                     ("nJetSel"+label, "I"),
@@ -140,6 +100,7 @@ class edgeFriends:
                     ("nFatJetSel"+label, "I"),
                     ("nFatJetSel_jecUp"+label, "I"),
                     ("nFatJetSel_jecDn"+label, "I"),
+                    ("nTauSel"+label,"I"),
                     #("nEdgeIsoTracks"+label, "I"),
                     ("rightMjj"+label, "F"),
                     ("bestMjj"+label, "F"),
@@ -215,42 +176,42 @@ class edgeFriends:
                     ("Lep1_pt"+label, "F"), 
                     ("Lep1_eta"+label, "F"), 
                     ("Lep1_phi"+label, "F"),
-                    ("Lep1_miniPFRelIso_all"+label, "F"),
-                    ("Lep1_pfRelIso03_all"+label, "F"),
-                    ("Lep1_pfRelIso04_all"+label, "F"),
-                    ("Lep1_dxy"+label, "F"),
-                    ("Lep1_dz"+label, "F"),
-                    ("Lep1_sip3d"+label, "F"),
+                    #("Lep1_miniPFRelIso_all"+label, "F"),
+                    #("Lep1_pfRelIso03_all"+label, "F"),
+                    #("Lep1_pfRelIso04_all"+label, "F"),
+                    #("Lep1_dxy"+label, "F"),
+                    #("Lep1_dz"+label, "F"),
+                    #("Lep1_sip3d"+label, "F"),
                     ("Lep1_pdgId"+label, "I"), 
                     ("Lep1_tightCharge"+label, "F"), 
-                    ("Lep1_mvaFall17V1Iso"+label, "F"),
-                    ("Lep1_mvaFall17V1noIso"+label, "F"),
+                    #("Lep1_mvaFall17V1Iso"+label, "F"),
+                    #("Lep1_mvaFall17V1noIso"+label, "F"),
                     ("Lep1_genPartFlav"+label, "I"), 
                     #("Lep1_minTauDR"+label, "F"),              
                     ("Lep2_pt"+label, "F"), 
                     ("Lep2_eta"+label, "F"),
                     ("Lep2_phi"+label, "F"),
-                    ("Lep2_miniPFRelIso_all"+label, "F"),
-                    ("Lep2_pfRelIso03_all"+label, "F"),
-                    ("Lep2_pfRelIso04_all"+label, "F"),
-                    ("Lep2_dxy"+label, "F"),
-                    ("Lep2_dz"+label, "F"),
-                    ("Lep2_sip3d"+label, "F"),
+                    # ("Lep2_miniPFRelIso_all"+label, "F"),
+                    # ("Lep2_pfRelIso03_all"+label, "F"),
+                    # ("Lep2_pfRelIso04_all"+label, "F"),
+                    # ("Lep2_dxy"+label, "F"),
+                    # ("Lep2_dz"+label, "F"),
+                    # ("Lep2_sip3d"+label, "F"),
                     ("Lep2_pdgId"+label, "I"),
                     ("Lep2_tightCharge"+label, "F"),
-                    ("Lep2_mvaFall17V1Iso"+label, "F"),
-                    ("Lep2_mvaFall17V1noIso"+label, "F"),
+                    #("Lep2_mvaFall17V1Iso"+label, "F"),
+                    #("Lep2_mvaFall17V1noIso"+label, "F"),
                     ("Lep2_genPartFlav"+label, "I"), 
                     #("Lep2_minTauDR"+label, "F"),      
                     ("PileupW"+label, "F"), 
                     ("PileupW_Up"+label, "F"),
                     ("PileupW_Dn"+label, "F"), 
-                    ("min_mlb1"+label, "F"),
-                    ("min_mlb2"+label, "F"),
-                    ("min_mlb1Up"+label, "F"),
-                    ("min_mlb2Up"+label, "F"),
-                    ("min_mlb1Dn"+label, "F"),
-                    ("min_mlb2Dn"+label, "F"),
+                    # ("min_mlb1"+label, "F"),
+                    # ("min_mlb2"+label, "F"),
+                    # ("min_mlb1Up"+label, "F"),
+                    # ("min_mlb2Up"+label, "F"),
+                    # ("min_mlb1Dn"+label, "F"),
+                    # ("min_mlb2Dn"+label, "F"),
                     ("sum_mlb"+label, "F"), 
                     ("sum_mlbUp"+label, "F"),
                     ("sum_mlbDn"+label, "F"),
@@ -272,17 +233,15 @@ class edgeFriends:
                     ("mt2bb_jecDn"+label, "F"),
                     ("mt2bb_unclUp"+label, "F"),
                     ("mt2bb_unclDn"+label, "F"),
-                    #("weight_trigger"+label, "F"),
-                    ("weight_btagsf"+label, "F"),
-                    ("weight_btagsf_heavy_UP"+label, "F") ,
-                    ("weight_btagsf_heavy_DN"+label, "F") ,
-                    ("weight_btagsf_light_UP"+label, "F") ,
-                    ("weight_btagsf_light_DN"+label, "F") ,
+                    ('weight_btagsf'         +label, "F"),
+                    ('weight_btagsf_heavy_UP'+label, "F"),
+                    ('weight_btagsf_heavy_DN'+label, "F"),
+                    ('weight_btagsf_light_UP'+label, "F"),
+                    ('weight_btagsf_light_DN'+label, "F"),
                     ("d3D" + label, "F"),
                     ("parPt" + label, "F"),
                     ("ortPt" + label, "F"),
                     ("dTheta" + label, "F"),
-                    #('passesFilters' +label, 'I'),
                     ('genWeight' +label, 'F'),
                     ('mbb'+label, 'F'),
                     ('mbb_jecUp'+label, 'F'),
@@ -291,9 +250,6 @@ class edgeFriends:
                     ('FS_central_jets_jecUp'+label, 'F'),
                     ('FS_central_jets_jecDn'+label, 'F')                    
                  ]
-        ################## Trigger variables  
-        for trig in self.triggerlist:
-            biglist.append( ( '{tn}{lab}'.format(lab=label, tn=trig),'O') )
 
         ################## SUSY massess  
         for mass in self.susymasslist:
@@ -307,14 +263,16 @@ class edgeFriends:
         #     biglist.append( ("EdgeIsoTracksSel"+label+"_"+itfloat,"F",20,"nEdgeIsoTracks"+label) )
         
         ################## Selected jets
-        for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor pt_jecUp pt_jecDn".split():
+        for jfloat in "pt eta phi mass btagDeepB rawFactor pt_jecUp pt_jecDn".split():
             biglist.append( ("JetSel"+label+"_"+jfloat,"F",20,"nJetSel"+label) ) #if self.isMC:
         biglist.append( ("JetSel"+label+"_mcPt",     "F",20,"nJetSel"+label) )
-        biglist.append( ("JetSel"+label+"_mcPartonFlavour","I",20,"nJetSel"+label) )
+        biglist.append( ("JetSel"+label+"_hadronFlavour","I",20,"nJetSel"+label) )
         biglist.append( ("JetSel"+label+"_genJetIdx","I",20,"nJetSel"+label) )
         ################## Selected Fat jets
-        for fjfloat in "pt eta phi mass btagCSVV2 msoftdrop tau1 tau2 tau3 pt_jecUp pt_jecDn".split(): # btagDeepB  # esto tiene que volver
+        for fjfloat in "pt eta phi mass btagDeepB msoftdrop tau1 tau2 tau3 pt_jecUp pt_jecDn".split(): # btagDeepB  # esto tiene que volver
             biglist.append( ("FatJetSel"+label+"_"+fjfloat,"F",20,"nFatJetSel"+label) ) #if self.isMC:
+        for tfloat in "pt eta phi".split():
+            biglist.append( ("TauSel{label}_{tfloat}".format(label=label,tfloat=tfloat),"F",20,"nTauSel"+label))
         # esto tiene que volver
         #biglist.append( ("FatJetSel"+label+"_mcPt",     "F",20,"nFatJetSel"+label) )
         #biglist.append( ("FatJetSel"+label+"_mcMatchId","I",20,"nFatJetSel"+label) )
@@ -338,10 +296,10 @@ class edgeFriends:
         var_mcPt = 10 # mcPt
         ################## Get collections
         leps  =  [l for l in Collection(event,"LepGood","nLepGood")] # using object wrapper so p4 is uncorrected for electrons
-        # removing ecorrections for electrons
+        # removing ecorrections for electrons and adding year
         for l in leps: 
             if abs(l.pdgId) == 11: 
-                l.pt = l.pt/l.eCorr
+                if hasattr(l,'eCorr'):  l.pt = l.pt/l.eCorr
 
 
 
@@ -349,15 +307,23 @@ class edgeFriends:
         lepst = []
         nLepLoose = 0
         for il,lep in enumerate(leps):
-            if not _susyEdgeLoose(lep): 
+            if not _susyEdgeLoose(lep, self.year): 
                 continue
             nLepLoose += 1 
-            if not self.tightLeptonSel(lep): 
+            if not _susyEdgeTight(lep, self.year): 
                 continue
             lepst.append(lep)
+            
+        allTaus = [t for t in Collection(event,"Tau","nTau")]
+        taus = getSelectedTaus(allTaus,lepst)
+        tausret = {} 
+        for tfloat in 'pt eta phi'.split():
+            tausret[tfloat] = [getattr(tau, tfloat) for tau in taus]
+        self.out.fillBranch("nTauSel"+self.label,len(taus))
+        for k,v in tausret.iteritems():
+            self.out.fillBranch("TauSel%s_%s" % (self.label,k),v)
 
-        
-
+        lepst = filter(lambda x : x.pt > 20, lepst)
         lepst.sort(key = lambda x : x.pt, reverse=True)
         nLepTight = len(lepst)
         
@@ -370,6 +336,10 @@ class edgeFriends:
 
         jetsc    = [j for j in Collection(event,"Jet","nJet")]
         fatjetsc = [fj for fj in Collection(event,"FatJet","nFatJet")] 
+        
+        if self.year == 2018:
+            jetsc = self.smearJets(jetsc,0)
+
     
         if not isData: 
             genparts = [g for g in Collection(event,"GenPart","nGenPart")]
@@ -396,7 +366,7 @@ class edgeFriends:
             ntrue = event.Pileup_nTrueInt
 
         ################## Treatment of MET
-        (met, metphi)  = event.METFixEE2017_pt, event.METFixEE2017_phi #METFixEE2017
+        (met, metphi)  = (event.METFixEE2017_pt, event.METFixEE2017_phi) if (event.year == 2017) else (event.MET_pt, event.MET_phi)
         metp4 = ROOT.TLorentzVector()
         metp4.SetPtEtaPhiM(met, 0, metphi, 0)
         metp4obj = ROOT.TLorentzVector()
@@ -423,10 +393,10 @@ class edgeFriends:
         self.out.fillBranch("PileupW_Dn" + self.label, 1 if isData else event.puWeightDown)
 
 
-        MET_pt_jesTotalUp   = 0 if isData else event.METFixEE2017_pt_jesTotalUp    
-        MET_pt_jesTotalDown = 0 if isData else event.METFixEE2017_pt_jesTotalDown  
-        MET_pt_unclustEnUp  = 0 if isData else event.METFixEE2017_pt_unclustEnUp   
-        MET_pt_unclustEnDown= 0 if isData else event.METFixEE2017_pt_unclustEnDown 
+        MET_pt_jesTotalUp   = 0 if isData else event.METFixEE2017_pt_jesTotalUp    if event.year == 2017 else event.MET_pt_jesTotalUp   
+        MET_pt_jesTotalDown = 0 if isData else event.METFixEE2017_pt_jesTotalDown  if event.year == 2017 else event.MET_pt_jesTotalDown 
+        MET_pt_unclustEnUp  = 0 if isData else event.METFixEE2017_pt_unclustEnUp   if event.year == 2017 else event.MET_pt_unclustEnUp  
+        MET_pt_unclustEnDown= 0 if isData else event.METFixEE2017_pt_unclustEnDown if event.year == 2017 else event.MET_pt_unclustEnDown
 
 
         ################## MET stuff
@@ -490,9 +460,6 @@ class edgeFriends:
                 self.out.fillBranch('GENptZZ'  + self.label,  gtotPt )       
 
 
-        ################### Trigger list Atencion: Esto es preciso hacerlo aqui?
-        for trig in self.triggerlist:
-            self.out.fillBranch(trig+self.label, 0 if not hasattr(event, trig) else getattr(event, trig) )
 
  
         ################### Calculating two lepton variables for all elements of the collection
@@ -532,7 +499,7 @@ class edgeFriends:
             lcount = 1
             lepret = {} 
             for lep in [lepst[0],lepst[1]]:
-                for lfloat in 'pt eta phi miniPFRelIso_all pdgId mvaFall17V1Iso mvaFall17V1noIso dxy dz sip3d pfRelIso03_all pfRelIso04_all tightCharge'.split():
+                for lfloat in 'pt eta phi pdgId tightCharge'.split(): # dxy dz sip3d pfRelIso03_all pfRelIso04_all mvaFall17V1Iso mvaFall17V1noIso miniPFRelIso_all 
                     if lfloat == 'genPartFlav' and isData:
                         lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = 1
                     else:
@@ -819,16 +786,16 @@ class edgeFriends:
 
         ################### Compute jet and fatjet variables Atencion
         jetret = {} 
-        for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor pt_jecUp pt_jecDn".split():
+        for jfloat in "pt eta phi mass btagDeepB rawFactor pt_jecUp pt_jecDn".split():
             jetret[jfloat] = []
         if not isData:
-            for jmc in "mcPt mcPartonFlavour genJetIdx".split():
-                #mcPt mcFlavour mcMatchId hadronFlavour
+            for jmc in "mcPt genJetIdx hadronFlavour".split():
+                #mcPt mcFlavour mcMatchId 
                 jetret[jmc] = []
 
         for idx in ijlist:
             jet = jetsc[idx] 
-            for jfloat in "pt eta phi mass btagCSVV2 btagDeepB rawFactor".split():
+            for jfloat in "pt eta phi mass btagDeepB rawFactor".split():
                 jetret[jfloat].append( getattr(jet,jfloat) )
 
             jetret['pt_jecUp'].append( jetsc_jecUp[idx].pt if idx < len(jetsc_jecUp) else -99)
@@ -836,12 +803,12 @@ class edgeFriends:
 
             if not isData: # Atencion
                 jetret["genJetIdx"].append( getattr(jet, "genJetIdx") if not isData else -1.)
+                jetret["hadronFlavour"].append( getattr(jet, "hadronFlavour") if not isData else -1.)
+                
                 if getattr(jet, "genJetIdx") == -1 or len(genjets)<=jet.genJetIdx:
-                    jetret["mcPartonFlavour"].append(-1)
                     jetret["mcPt"].append(-1)
                 else:
                     gjet = genjets[getattr(jet, "genJetIdx")] 
-                    jetret["mcPartonFlavour"].append( getattr(gjet, "partonFlavour") if not isData else -1)
                     jetret["mcPt"].append( getattr(gjet, "pt") if not isData else -1.)
 
                 #for jmc in "mcPt mcFlavour hadronFlavour".split(): # Atencion: Esto es lo que habia antes
@@ -854,7 +821,7 @@ class edgeFriends:
 
         ## Variables of fatjets
         fatjetret = {} 
-        for fjfloat in "pt eta phi mass btagCSVV2 tau1 tau2 tau3 msoftdrop pt_jecUp pt_jecDn".split(): # 
+        for fjfloat in "pt eta phi mass btagDeepB tau1 tau2 tau3 msoftdrop pt_jecUp pt_jecDn".split(): # 
             fatjetret[fjfloat] = []
 #        if not isData:
 #            for fjmc in "mcPt mcMatchId hadronFlavour".split():  # mcFlavour 
@@ -863,7 +830,7 @@ class edgeFriends:
             
         for idx in ifjlist:
             fatjet = fatjetsc[idx]
-            for fjfloat in "pt eta phi mass tau1 btagCSVV2 tau2 tau3 msoftdrop".split():#     ".split(): 
+            for fjfloat in "pt eta phi mass btagDeepB tau1 tau2 tau3 msoftdrop".split():#     ".split(): 
                 fatjetret[fjfloat].append( getattr(fatjet,fjfloat) )
             fatjetret['pt_jecUp'].append( fatjetsc_jecUp[idx].pt if idx < len(fatjetsc_jecUp) else -99) 
             fatjetret['pt_jecDn'].append( fatjetsc_jecDn[idx].pt if idx < len(fatjetsc_jecDn) else -99) 
@@ -874,6 +841,7 @@ class edgeFriends:
         for k,v in fatjetret.iteritems(): 
             self.out.fillBranch("FatJetSel%s_%s" % (self.label,k),v) #fullret["FatJetSel%s_%s" % (self.label,k)] = v
 
+            
 
         ################### Compute isotrack variables
         #ret["nEdgeIsoTracks"] = event.nEdgeIsoTracks
@@ -968,8 +936,8 @@ class edgeFriends:
             min_mlb = min_mlb if min_mlb < 1e6  else -1.
             max_mlb = max_mlb if max_mlb < 1e6  else -1.
             
-            self.out.fillBranch("min_mlb1%s"%jec + self.label, min_mlb)
-            self.out.fillBranch("min_mlb2%s"%jec + self.label, max_mlb)
+            #self.out.fillBranch("min_mlb1%s"%jec + self.label, min_mlb)
+            #self.out.fillBranch("min_mlb2%s"%jec + self.label, max_mlb)
             self.out.fillBranch("sum_mlb%s"%jec  + self.label, (min_mlb + max_mlb) if min_mlb > 0. and max_mlb> 0. else -1.)
        
 
@@ -1189,10 +1157,13 @@ class edgeFriends:
 	
         for j in jetcol:
             quot = 1.0-getattr(j, "rawFactor") #getattr(j, "CorrFactor_L1L2L3Res") if getattr(j, "CorrFactor_L1L2L3Res") > 0 else getattr(j, "CorrFactor_L1L2L3")
-            if syst > 0: 
+            if syst == 1: 
                 j.pt = j.pt_jesTotalUp
-            else:
+            elif syst == -1:
                 j.pt = j.pt_jesTotalDown
+            elif syst == 0:
+                j.pt = j.pt_nom
+            else: raise RuntimeError("Unknown syst",syst)
         return jetcol
     #################################################################################################################
 
@@ -1248,42 +1219,42 @@ class edgeFriends:
         return drmjj  
     #################################################################################################################
   
-    def get_SF_btag(self, pt, eta, mcFlavour):
+    # def get_SF_btag(self, pt, eta, mcFlavour):
 
-       flavour = 2
-       if abs(mcFlavour) == 5: flavour = 0
-       elif abs(mcFlavour)==4: flavour = 1
+    #    flavour = 2
+    #    if abs(mcFlavour) == 5: flavour = 0
+    #    elif abs(mcFlavour)==4: flavour = 1
 
-       pt_cutoff  = max(20. ,  pt)
-       eta_cutoff = min(2.39, abs(eta))
+    #    pt_cutoff  = max(20. ,  pt)
+    #    eta_cutoff = min(2.39, abs(eta))
 
-       if flavour == 2:
-          SF = self.reader_light.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
-          SFup = self.reader_light.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
-          SFdown = self.reader_light.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
-          SFcorr = self.reader_light_FASTSIM.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
-          SFupcorr = self.reader_light_FASTSIM.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
-          SFdowncorr = self.reader_light_FASTSIM.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
-       elif flavour == 1:
-          SF = self.reader_c.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
-          SFup = self.reader_c.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
-          SFdown = self.reader_c.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
-          SFcorr = self.reader_c_FASTSIM.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
-          SFupcorr = self.reader_c_FASTSIM.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
-          SFdowncorr = self.reader_c_FASTSIM.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
-       else:
-          SF = self.reader_heavy.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
-          SFup = self.reader_heavy.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
-          SFdown = self.reader_heavy.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
-          SFcorr = self.reader_heavy_FASTSIM.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
-          SFupcorr = self.reader_heavy_FASTSIM.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
-          SFdowncorr = self.reader_heavy_FASTSIM.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
+    #    if flavour == 2:
+    #       SF = self.reader_light.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
+    #       SFup = self.reader_light.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
+    #       SFdown = self.reader_light.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
+    #       SFcorr = self.reader_light_FASTSIM.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
+    #       SFupcorr = self.reader_light_FASTSIM.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
+    #       SFdowncorr = self.reader_light_FASTSIM.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
+    #    elif flavour == 1:
+    #       SF = self.reader_c.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
+    #       SFup = self.reader_c.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
+    #       SFdown = self.reader_c.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
+    #       SFcorr = self.reader_c_FASTSIM.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
+    #       SFupcorr = self.reader_c_FASTSIM.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
+    #       SFdowncorr = self.reader_c_FASTSIM.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
+    #    else:
+    #       SF = self.reader_heavy.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
+    #       SFup = self.reader_heavy.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
+    #       SFdown = self.reader_heavy.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
+    #       SFcorr = self.reader_heavy_FASTSIM.eval_auto_bounds("central", flavour, eta_cutoff, pt_cutoff)
+    #       SFupcorr = self.reader_heavy_FASTSIM.eval_auto_bounds("up", flavour, eta_cutoff, pt_cutoff)
+    #       SFdowncorr = self.reader_heavy_FASTSIM.eval_auto_bounds("down", flavour, eta_cutoff, pt_cutoff)
 
-       if self.isSMS:
-          return [SFcorr, SFupcorr, SFdowncorr]
-       else:
-          return [SF, SFup, SFdown]
-    #################################################################################################################
+    #    if self.isSMS:
+    #       return [SFcorr, SFupcorr, SFdowncorr]
+    #    else:
+    #       return [SF, SFup, SFdown]
+    # #################################################################################################################
  
     def getBtagEffFromFile(self, pt, eta, mcFlavour):
 
@@ -1317,7 +1288,7 @@ class edgeFriends:
         for jet in jets:
 
             csv = jet.btagDeepB
-            mcFlavor = (jet.hadronFlavour if hasattr(jet, 'hadronFlavour') else jet.mcFlavour)
+            mcFlavor = jet.hadronFlavour 
             eta = jet.eta
             pt = jet.pt
 
@@ -1326,7 +1297,7 @@ class edgeFriends:
             eff = self.getBtagEffFromFile(pt, eta, mcFlavor)
 
             istag = csv > self.btagMediumCut and abs(eta) < 2.5 and pt > 20
-            SF = self.get_SF_btag(pt, eta, mcFlavor)
+            SF = (jet.btagSF, jet.btagSF_up, jet.btagSF_down)
             if(istag):
                  mcTag = mcTag * eff
                  dataTag = dataTag * eff * SF[0]
@@ -1356,55 +1327,13 @@ class edgeFriends:
         return [wtbtag, wtbtagUp_heavy, wtbtagUp_light, wtbtagDown_heavy, wtbtagDown_light]
     #################################################################################################################
 
-    def selfNewMediumMuonId(self, muon):
-        
-        #Atencion 
-        var_LepGood_globalTrackChi2 = 1 # LepGood_globalTrackChi2
-        var_LepGood_chi2LocalPosition = 1 # LepGood_chi2LocalPosition
-        var_LepGood_trkKink = 1 # LepGood_trkKink
-        var_LepGood_innerTrackValidHitFraction = 1 # LepGood_innerTrackValidhitFraction
-
-        if not hasattr(muon, 'isGlobal'):
-            return (muon.mediumId == 1)
-        goodGlob = (muon.isGlobal and 
-                    var_LepGood_globalTrackChi2 < 3 and
-                    var_LepGood_chi2LocalPosition < 12 and
-                    var_LepGood_trkKink < 20)
-        isMedium = (var_LepGood_innerTrackValidHitFraction > 0.8 and
-                    muon.segmentComp > (0.303 if goodGlob else  0.451) )
-        return isMedium
-        #muon.segmentCompatibility < 0.49: return False
-    #################################################################################################################
-
-         
-    #################################################################################################################
-
-def newMediumMuonId(muon):
-
-    #Atencion 
-    var_LepGood_globalTrackChi2 = 1 # LepGood_globalTrackChi2
-    var_LepGood_chi2LocalPosition = 1 # LepGood_chi2LocalPosition
-    var_LepGood_trkKink = 1 # LepGood_trkKink
-    var_LepGood_innerTrackValidHitFraction = 1 # LepGood_innerTrackValidhitFraction
 
 
-    if not hasattr(muon, 'isGlobal'):
-        return (muon.mediumId == 1)
-    goodGlob = (muon.isGlobal and 
-                var_LepGood_globalTrackChi2 < 3 and
-                var_LepGood_chi2LocalPosition < 12 and
-                var_LepGood_trkKink < 20)
-    isMedium = (var_LepGood_innerTrackValidHitFraction > 0.8 and
-                muon.segmentComp > (0.303 if goodGlob else  0.451) )
-    return isMedium
-    #muon.segmentCompatibility < 0.49: return False
-    #################################################################################################################
 
 
-def _susyEdgeLoose(lep):
+def _susyEdgeLoose(lep,year):
     
-    leppt = lep.pt # /lep.eCorr if hasattr(lep,'eCorr') and not lep.eCorr == 0   else lep.pt# eCorr are dis-applied by default
-        #leppt = lep.pt # If energy corrections applied
+    leppt = lep.pt # ecorr is corrected above
 
     if leppt <= 5.: return False # Atencion before 10.
     if abs(lep.dxy) > 0.2: return False
@@ -1422,52 +1351,34 @@ def _susyEdgeLoose(lep):
         if lepeta > 2.4: return False
         if (lep.convVeto == 0) or (lep.lostHits == 1): return False
             
-        # MVA definition:
-        lepeta = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
-        if lepeta < 0.8:
-            if leppt>5. and leppt<10.:
-                if not lep.mvaFall17V1noIso > 0.488: return False
-            if leppt>10. and leppt<25.:
-                if not lep.mvaFall17V1noIso > (-0.788 + (0.148/15.)*(leppt -10.)): return False
-            if leppt>=25.:
-                if not lep.mvaFall17V1noIso > -0.64: return False
+        if year == 2016: return mvaID2016VLoose(lep)
+        if year == 2017: return mvaID2017VLoose(lep)
+        if year == 2018: return mvaID2018VLoose(lep)
 
-        if lepeta > 0.8 and lepeta < 1.479:
-            if leppt>5. and leppt<10.:
-                if not lep.mvaFall17V1noIso > -0.045: return False
-            if leppt>10. and leppt<25.:
-                if not lep.mvaFall17V1noIso > (-0.85 + (0.075/15.)*(leppt -10.)): return False
-            if leppt>=25.:
-                if not lep.mvaFall17V1noIso > -0.775: return False
-
-        if lepeta > 1.479 and lepeta < 2.4:
-            if leppt>5. and leppt<10.:
-                if not lep.mvaFall17V1noIso > 0.176: return False
-            if leppt>10. and leppt<25.:
-                if not lep.mvaFall17V1noIso > (-0.81 + (0.077/15.)*(leppt -10.)): return False
-            if leppt>=25.:
-                if not lep.mvaFall17V1noIso > -0.733: return False
-
-          #  A = -0.86+(-0.85+0.86)*(abs(lep.eta)>0.8)+(-0.81+0.86)*(abs(lep.eta)>1.479)
-          #  B = -0.96+(-0.96+0.96)*(abs(lep.eta)>0.8)+(-0.95+0.96)*(abs(lep.eta)>1.479)    
-          #  if lep.pt > 10:
-                # Atencion delete line below and decomment second line
-          #      if not lep.mvaFall17V1Iso: return False
-                #if not lep.mvaIdSpring16GP > min( A , max( B , A+(B-A)/10*(lep.pt-15) ) ): return False
-
-          # if (lepeta < 0.8   and lep.mvaIdSpring15 < -0.70) : return False
-          # if (lepeta > 0.8   and lepeta < 1.479 and lep.mvaIdSpring15 < -0.83) : return False
-          # if (lepeta > 1.479 and lep.mvaIdSpring15 < -0.92) : return False
-          #if hasattr(lep, 'idEmuTTH'):
-          #  if lep.idEmuTTH == 0: return False
     return True                                                                                  
 
-def _susyEdgeTight(lep):
 
+
+def getSelectedTaus(alltaus,leps):
+    taus = [] 
+    for tau in alltaus:
+        if tau.pt < 20: continue
+        if abs(tau.eta) > 2.3: continue
+        if not(tau.idMVAoldDM2017v2&16): continue
+        if not(tau.idAntiEle&2): continue
+        clean=True
+        for lep in leps:
+            if deltaR(tau,lep) < 0.4: clean = False
+        if not clean: continue
+        taus.append(tau)
+    return taus
+
+def _susyEdgeTight(lep,year):
+    
     leppt = lep.pt # /lep.eCorr if not lep.eCorr == 0 and lep.doCorrections == False else lep.pt# If not energy corrections applied 
     #leppt = lep.pt # If energy corrections applied
 
-    if leppt < 20.: return False
+    if leppt < 10.: return False # pt > 20 applied after tau cleaning is made
     eta = abs(lep.eta)
     if eta          > 2.4: return False
     if abs(lep.dxy) > 0.05: return False
@@ -1488,33 +1399,190 @@ def _susyEdgeTight(lep):
         if (lep.convVeto == 0) or (lep.lostHits > 0) : return False
         #if leppt < 10.: return False
         if lep.miniPFRelIso_all >= 0.1: return False
-        if etatest < 0.8:
-            if leppt<25:
-                if not lep.mvaFall17V1noIso > (0.2 + 0.032*(leppt -10.)): return False
-            if leppt>=25.:
-                if not lep.mvaFall17V1noIso > 0.68: return False
+        if   year == 2016: 
+            if not mvaID2016Tight(lep): return False
+        elif year == 2017: 
+            if not mvaID2017Tight(lep): return False
+        elif year == 2018: 
+            if not mvaID2018Tight(lep): return False
 
-        if etatest > 0.8 and etatest < 1.479:
-            if leppt<25.:                  
-                if not lep.mvaFall17V1noIso > (0.1 + 0.025*(leppt -10.)): return False
-            if leppt>=25.:
-                if not lep.mvaFall17V1noIso > 0.475: return False
-
-        if etatest > 1.479 and etatest < 2.4:
-            if leppt<25.:              
-                if not lep.mvaFall17V1noIso > (-0.1 + 0.028*(leppt -10.)): return False
-            if leppt>=25.:
-                if not lep.mvaFall17V1noIso > 0.32: return False
+    return True
 
 
 
-        #A = 0.77+(0.56-0.77)*(abs(lep.eta)>0.8)+(0.48-0.56)*(abs(lep.eta)>1.479)
-        #B = 0.52+(0.11-0.52)*(abs(lep.eta)>0.8)+(-0.01-0.11)*(abs(lep.eta)>1.479)    
-        #if lep.pt > 10.:
-            # Atencion delete line below and decomment second line
-        #    if not lep.mvaFall17V1Iso: return False
-            #if not (lep.mvaIdSpring16GP > min( A , max( B , A+(B-A)/10*(lep.pt-15) ) )): return False
-        #else: return False
 
-        #if lep.miniPFRelIso_all > 0.1: return False
+def mvaID2016VLoose(lep):
+    # https://twiki.cern.ch/twiki/pub/CMS/SUSLeptonSF/Run2_SUSYwp_EleCB_MVA_8Jan19.pdf
+    lepeta = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
+    leppt = lep.pt
+    mva   = min(0.99999,max(-0.99999, lep.mvaFall17V2noIso)) # otherwise can be exactly 1 or -1 because of the reduced precision
+    raw   = -0.5*math.log( (1-mva)/(1+mva)  )
+    if lepeta < 0.8:
+        if leppt>5. and leppt<10.:
+            if not raw > 1.309: return False
+        if leppt>10. and leppt<25.:
+            if not raw > ( 0.887 + 0.088*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 0.887: return False
+
+    if lepeta > 0.8 and lepeta < 1.479:
+        if leppt>5. and leppt<10.:
+            if not raw > 0.373: return False
+        if leppt>10. and leppt<25.:
+            if not raw > (0.112 + 0.099*(leppt- 25)): return False
+        if leppt>=25.:
+            if not raw > -0.112: return False
+
+    if lepeta > 1.479 and lepeta < 2.4:
+        if leppt>5. and leppt<10.:
+            if not raw > 0.071: return False
+        if leppt>10. and leppt<25.:
+            if not raw > (0.112 + 0.099*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 0.112: return False
+    return True
+
+
+
+
+def mvaID2017VLoose(lep):
+    # https://twiki.cern.ch/twiki/pub/CMS/SUSLeptonSF/Run2_SUSYwp_EleCB_MVA_8Jan19.pdf
+    lepeta = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
+    leppt = lep.pt
+    if lepeta < 0.8:
+        if leppt>5. and leppt<10.:
+            if not lep.mvaFall17V1noIso > 0.488: return False
+        if leppt>10. and leppt<25.:
+            if not lep.mvaFall17V1noIso > (-0.788 + (0.148/15.)*(leppt -10.)): return False
+        if leppt>=25.:
+            if not lep.mvaFall17V1noIso > -0.64: return False
+
+    if lepeta > 0.8 and lepeta < 1.479:
+        if leppt>5. and leppt<10.:
+            if not lep.mvaFall17V1noIso > -0.045: return False
+        if leppt>10. and leppt<25.:
+            if not lep.mvaFall17V1noIso > (-0.85 + (0.075/15.)*(leppt -10.)): return False
+        if leppt>=25.:
+            if not lep.mvaFall17V1noIso > -0.775: return False
+
+    if lepeta > 1.479 and lepeta < 2.4:
+        if leppt>5. and leppt<10.:
+            if not lep.mvaFall17V1noIso > 0.176: return False
+        if leppt>10. and leppt<25.:
+            if not lep.mvaFall17V1noIso > (-0.81 + (0.077/15.)*(leppt -10.)): return False
+        if leppt>=25.:
+            if not lep.mvaFall17V1noIso > -0.733: return False
+    return True
+
+
+def mvaID2018VLoose(lep):
+    # https://twiki.cern.ch/twiki/pub/CMS/SUSLeptonSF/Run2_SUSYwp_EleCB_MVA_8Jan19.pdf
+    lepeta = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
+    leppt = lep.pt
+    mva   = min(0.99999,max(-0.99999, lep.mvaFall17V2noIso)) # otherwise can be exactly 1 or -1 because of the reduced precision
+    raw   = -0.5*math.log( (1-mva)/(1+mva)  )
+    if lepeta < 0.8:
+        if leppt>5. and leppt<10.:
+            if not raw > 1.320: return False
+        if leppt>10. and leppt<25.:
+            if not raw > ( 1.204 + 0.066*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 1.204: return False
+
+    if lepeta > 0.8 and lepeta < 1.479:
+        if leppt>5. and leppt<10.:
+            if not raw >  0.192: return False
+        if leppt>10. and leppt<25.:
+            if not raw > 0.084 + 0.033*(leppt - 25): return False
+        if leppt>=25.:
+            if not raw > 0.084: return False
+
+    if lepeta > 1.479 and lepeta < 2.4:
+        if leppt>5. and leppt<10.:
+            if not raw > 0.362: return False
+        if leppt>10. and leppt<25.:
+            if not raw > -0.123 + 0.053*(leppt - 25) : return False
+        if leppt>=25.:
+            if not raw > -0.123: return False
+    return True
+
+
+
+
+def mvaID2016Tight(lep):
+    # https://twiki.cern.ch/twiki/pub/CMS/SUSLeptonSF/Run2_SUSYwp_EleCB_MVA_8Jan19.pdf
+    lepeta = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
+    leppt = lep.pt
+    mva   = min(0.99999,max(-0.99999, lep.mvaFall17V2noIso)) # otherwise can be exactly 1 or -1 because of the reduced precision
+    raw   = -0.5*math.log( (1-mva)/(1+mva)  )
+
+
+    if lepeta < 0.8:
+        if leppt<25.:
+            if not raw > (3.447 + 0.063*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 4.392: return False
+
+    if lepeta > 0.8 and lepeta < 1.479:
+        if leppt<25.:
+            if not raw > (2.522 + 0.058*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 3.392: return False
+
+    if lepeta > 1.479 and lepeta < 2.4:
+        if leppt<25.:
+            if not raw > (1.555 + 0.075*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 2.680: return False
+    return True
+
+
+def mvaID2017Tight(lep):
+    # https://twiki.cern.ch/twiki/pub/CMS/SUSLeptonSF/Run2_SUSYwp_EleCB_MVA_8Jan19.pdf
+    lepeta = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
+    leppt = lep.pt
+    if lepeta < 0.8:
+        if  leppt<25.:
+            if not lep.mvaFall17V1noIso > ( 0.2+0.032*(leppt-10)): return False
+        if leppt>=25.:
+            if not lep.mvaFall17V1noIso > 0.68: return False
+
+    if lepeta > 0.8 and lepeta < 1.479:
+        if  leppt<25.:
+            if not lep.mvaFall17V1noIso > (0.1+0.025*(leppt-10)): return False
+        if leppt>=25.:
+            if not lep.mvaFall17V1noIso > 0.475: return False
+
+    if lepeta > 1.479 and lepeta < 2.4:
+        if  leppt<25.:
+            if not lep.mvaFall17V1noIso > (-0.1+0.028*(leppt-10)): return False
+        if leppt>=25.:
+            if not lep.mvaFall17V1noIso > 0.32: return False
+    return True
+
+
+def mvaID2018Tight(lep):
+    # https://twiki.cern.ch/twiki/pub/CMS/SUSLeptonSF/Run2_SUSYwp_EleCB_MVA_8Jan19.pdf
+    lepeta = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
+    leppt = lep.pt
+    mva   = min(0.99999,max(-0.99999, lep.mvaFall17V2noIso)) # otherwise can be exactly 1 or -1 because of the reduced precision
+    raw   = -0.5*math.log( (1-mva)/(1+mva)  )
+
+    if lepeta < 0.8:
+        if  leppt<25.:
+            if not raw > ( 4.277 + 0.112*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 4.277: return False
+
+    if lepeta > 0.8 and lepeta < 1.479:
+        if  leppt<25.:
+            if not raw > (3.152 + 0.060*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 3.152: return False
+
+    if lepeta > 1.479 and lepeta < 2.4:
+        if  leppt<25.:
+            if not raw > ( 2.359 + 0.087*(leppt - 25)): return False
+        if leppt>=25.:
+            if not raw > 2.359: return False
     return True

@@ -1,2 +1,9 @@
 drop * 
 keep *Edge*
+keep xsec
+keep isData
+keep year
+keep HLT_*Ele*
+keep HLT_*Mu*
+keep HLT_*MET*
+keep HLT_*HT*

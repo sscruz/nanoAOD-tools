@@ -31,13 +31,15 @@ class btagSFProducer(Module):
     """Calculate btagging scale factors
         algo has to be either 'csvv2' or 'cmva'
     """
-    def __init__(self, era, algo = 'csvv2', sfFileName = None, verbose = 0):
+    def __init__(self, era, algo = 'csvv2', sfFileName = None, verbose = 0, suffix=""):
 
         self.era = era
 
         self.algo = algo.lower()
 
         self.verbose = verbose
+
+        self.suffix  = suffix
 
         # CV: Return value of BTagCalibrationReader::eval_auto_bounds() is zero
         #     in case jet abs(eta) > 2.4 !!
@@ -67,18 +69,64 @@ class btagSFProducer(Module):
                         2 : "incl"   # light
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
-                }
+                },
             },
             'deepcsv' : {
-                '2017' : {
-                    'inputFileName' : "DeepCSV_94XSF_V2_B_F.csv",
+                '2016' : {
+                    'inputFileName' : "DeepCSV_2016LegacySF_V1.csv",
                     'measurement_types' : {
                         0 : "comb",  # b
                         1 : "comb",  # c
                         2 : "incl"   # light
                     },
                     'supported_wp' : [ "L", "M", "T", "shape_corr"]
-                }
+                },
+                '2017' : {
+                    'inputFileName' : "DeepCSV_94XSF_V4_B_F.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+                '2018' : {
+                    'inputFileName' : "DeepCSV_102XSF_V1.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+                '2016_fast' : {
+                    'inputFileName' : "deepcsv_13TEV_16SL_18_3_2019.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+                '2017_fast' : {
+                    'inputFileName' : "deepcsv_13TEV_17SL_18_3_2019.csv",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+                '2018_fast' : {
+                    'inputFileName' : "",
+                    'measurement_types' : {
+                        0 : "comb",  # b
+                        1 : "comb",  # c
+                        2 : "incl"   # light
+                    },
+                    'supported_wp' : [ "L", "M", "T", "shape_corr"]
+                },
+
             },
             'cmva' : {
                 '2016' : {
@@ -146,9 +194,9 @@ class btagSFProducer(Module):
         self.branchNames_central_and_systs = {}
         for central_or_syst in self.central_and_systs:
             if central_or_syst == "central":
-                self.branchNames_central_and_systs[central_or_syst] = "Jet_btagSF"
+                self.branchNames_central_and_systs[central_or_syst] = "Jet_btagSF%s"%self.suffix
             else:
-                self.branchNames_central_and_systs[central_or_syst] = "Jet_btagSF_%s" % central_or_syst
+                self.branchNames_central_and_systs[central_or_syst] = "Jet_btagSF%s_%s"%(self.suffix, central_or_syst)
 
         self.branchNames_central_and_systs_shape_corr = {}
         for central_or_syst in self.central_and_systs_shape_corr:
@@ -290,3 +338,4 @@ class btagSFProducer(Module):
 
 btagSF2016 = lambda : btagSFProducer("2016")
 btagSF2017 = lambda : btagSFProducer("2017")
+btagSF2018 = lambda : btagSFProducer("2018")

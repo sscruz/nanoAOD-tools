@@ -437,10 +437,13 @@ jetmetUncertainties2016          = lambda : jetmetUncertaintiesProducer("2016", 
 jetmetUncertainties2016All       = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", "Summer16_25nsV1", [ "All" ])
 jetmetUncertainties2017          = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", "Fall17_V3"      , [ "Total" ])
 jetmetUncertainties2017All       = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", "Fall17_V3"      , [ "All" ], redoJEC=True)
-jetmetUncertainties2017AK8chs    = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", "Fall17_V3"      , [ "Total" ], jetType="AK8PFchs")
-jetmetUncertainties2017AK8chsAll = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", "Fall17_V3"      , [ "All" ], redoJEC=True)
 jetmetUncertainties2018          = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC"         , "Autumn18_V1"    , [ "Total" ], redoJEC=True)
 jetmetUncertainties2018All       = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC"         , "Autumn18_V1"    , [ "All" ], redoJEC=True)
+
+jetmetUncertainties2016AK8chs    = lambda : jetmetUncertaintiesProducer("2016", "Summer16_23Sep2016V4_MC", "Summer16_25nsV1", [ "Total" ], jetType="AK8PFchs")
+jetmetUncertainties2017AK8chs    = lambda : jetmetUncertaintiesProducer("2017", "Fall17_17Nov2017_V32_MC", "Fall17_V3"      , [ "Total" ], jetType="AK8PFchs")
+jetmetUncertainties2018AK8chs    = lambda : jetmetUncertaintiesProducer("2018", "Autumn18_V8_MC"         , "Autumn18_V1"    , [ "Total" ], jetType="AK8PFchs")
+
 
 """ Why?
 jetmetUncertainties2018A =    lambda : jetmetUncertaintiesProducer("2018", "Autumn18_RunA_V8_DATA", [ "Total" ], redoJEC=True)

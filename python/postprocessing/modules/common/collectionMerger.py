@@ -9,12 +9,13 @@ _rootLeafType2rootBranchType = { 'UChar_t':'b', 'Char_t':'B', 'UInt_t':'i', 'Int
 
 class collectionMerger(Module):
 
-    def __init__(self,input,output,sortkey = lambda x : x.pt,reverse=True,selector=None,maxObjects=None):
+    def __init__(self,input,output,sortkey = lambda x : x.pt,reverse=True,selector=None,maxObjects=None,store=True):
         self.input = input
         self.output = output
         self.nInputs = len(self.input)
         self.sortkey = lambda (obj,j,i) : sortkey(obj)
         self.reverse = reverse
+        self.store   = store
         self.selector = [(selector[coll] if coll in selector else (lambda x: True)) for coll in self.input] if selector else None # pass dict([(collection_name,lambda obj : selection(obj)])
         self.maxObjects = maxObjects # save only the first maxObjects objects passing the selection in the merged collection
         self.branchType = {}
@@ -36,8 +37,9 @@ class collectionMerger(Module):
                 if br in self.brlist_sep[j]: self.is_there[bridx][j]=True
 
         self.out = wrappedOutputTree
-        for br in self.brlist_all:
-            self.out.branch("%s_%s"%(self.output,br), _rootLeafType2rootBranchType[self.branchType[br]], lenVar="n%s"%self.output)
+        if self.store:
+            for br in self.brlist_all:
+                self.out.branch("%s_%s"%(self.output,br), _rootLeafType2rootBranchType[self.branchType[br]], lenVar="n%s"%self.output)
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
@@ -62,7 +64,13 @@ class collectionMerger(Module):
             out = []
             for obj,j,i in objects:
                 out.append(getattr(obj,br) if self.is_there[bridx][j] else 0)
-            self.out.fillBranch("%s_%s"%(self.output,br), out)
+            if self.store:
+                self.out.fillBranch("%s_%s"%(self.output,br), out)
+            else: 
+                setattr(event, "%s_%s"%(self.output,br), out)
+        if not self.store:
+            setattr(event, 'n%s'%self.output, len(out))
+
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
