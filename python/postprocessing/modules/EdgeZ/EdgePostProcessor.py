@@ -89,31 +89,31 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
         yeartriggers = eval('triggers%d'%doYear)
 
         if doYear in [2016, 2017]:
-            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
             DatasetsAndTriggersMap["DoubleEG"       ] = yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso']
             DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso']
+            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
             DatasetsAndTriggersMap["SingleMuon"     ] = yeartriggers['triggers_1mu_iso']
             DatasetsAndTriggersMap["SingleElectron" ] = yeartriggers['triggers_1e_iso']
             DatasetsAndTriggersMap["MET" ] = []
         
-            DatasetsAndVetosMap["DoubleMuon"    ] = []
-            DatasetsAndVetosMap["DoubleEG"      ] = DatasetsAndTriggersMap["DoubleMuon"] + DatasetsAndVetosMap["DoubleMuon"] 
+            DatasetsAndVetosMap["DoubleEG"      ] = []
             DatasetsAndVetosMap["MuonEG"        ] = DatasetsAndTriggersMap["DoubleEG"  ] + DatasetsAndVetosMap["DoubleEG"  ] 
-            DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["MuonEG"    ] + DatasetsAndVetosMap["MuonEG"    ] 
+            DatasetsAndVetosMap["DoubleMuon"    ] = DatasetsAndTriggersMap["MuonEG"  ] + DatasetsAndVetosMap["MuonEG"  ] 
+            DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["DoubleMuon"    ] + DatasetsAndVetosMap["DoubleMuon"    ] 
             DatasetsAndVetosMap["SingleElectron"] = DatasetsAndTriggersMap["SingleMuon"] + DatasetsAndVetosMap["SingleMuon"] 
             DatasetsAndVetosMap["MET"] = [] 
         
         else: 
-            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
             DatasetsAndTriggersMap["EGamma"         ] = yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso'] + yeartriggers['triggers_1e_iso']
             DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso']
+            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
             DatasetsAndTriggersMap["SingleMuon"     ] = yeartriggers['triggers_1mu_iso']
             DatasetsAndTriggersMap["MET" ] = []
         
-            DatasetsAndVetosMap["DoubleMuon"    ] = []
-            DatasetsAndVetosMap["EGamma"        ] = DatasetsAndTriggersMap["DoubleMuon"] + DatasetsAndVetosMap["DoubleMuon"] 
+            DatasetsAndVetosMap["EGamma"        ] = []
             DatasetsAndVetosMap["MuonEG"        ] = DatasetsAndTriggersMap["EGamma"    ] + DatasetsAndVetosMap["EGamma"  ] 
-            DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["MuonEG"    ] + DatasetsAndVetosMap["MuonEG"    ] 
+            DatasetsAndVetosMap["DoubleMuon"    ] = DatasetsAndTriggersMap["MuonEG"] + DatasetsAndVetosMap["MuonEG"] 
+            DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["DoubleMuon"    ] + DatasetsAndVetosMap["DoubleMuon"    ] 
             DatasetsAndVetosMap["MET"] = [] 
 
     
