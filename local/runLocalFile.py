@@ -31,13 +31,16 @@ optjsonfile.close()
 ## create dummy sample json to run locally
 options_sample = open('options_sample.json','w')
 
-sampOpt = { 'isData' : False,
-            'triggers' : [], #triggers_mumu_iso + triggers_3mu , # [],#triggers_ee + triggers_3e+triggers_ee_noniso,
+#from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import triggers2017
+#yeartriggers = triggers2017
+
+sampOpt = { 'isData' : True,
+            'triggers' :  [],#yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso'], 
             'year' : '2018',
-            'vetotriggers' : [],#triggers_mumu_iso + triggers_3mu,
+            'vetotriggers' :  [],#yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso'],
             'json':   None, # '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_29497-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt',
             'xsec' : 88.,
-            'name' : 'SingleMuon_Run2017B'
+            'name' : 'TTbar'
             }   
 
 options_sample.write(json.dumps( sampOpt))
@@ -48,8 +51,13 @@ options_sample.close()
 handle = open(options.cfg_file,'r')
 cfo = imp.load_source(options.cfg_file.split('/')[-1].rstrip('.py'), options.cfg_file, handle)
 
-cfo.POSTPROCESSOR.inputFiles = [ '/afs/cern.ch/work/s/sesanche/public/forEdge/myNanoProdMc2016_NANO.root']
-#cfo.POSTPROCESSOR.inputFiles = [ 'evt_1_889_126241.root']
+
+cfo.POSTPROCESSOR.inputFiles = [
+    #'/afs/cern.ch/work/s/sesanche/private/TTH/CMSSW_10_2_15/src/myNanoProdMc2016_NANO.root'
+    '/afs/cern.ch/work/s/sesanche/private/TTH/CMSSW_10_2_15/src/myNanoProdMc2018_NANO.root'
+]
+
+
 cfo.POSTPROCESSOR.run()
 
 

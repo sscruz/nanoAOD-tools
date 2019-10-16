@@ -52,21 +52,21 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
     dataSamples = eval('dataSamples%d'%doYear)
 
     filteredSamples = [] 
-    filterList = ['WZTo2L2Q', 'ZZTo2L2Nu'
-        #'TTJets_SingleLeptonFromT','TTJets_SingleLeptonFromT','TTTo2L2Nu','TTToSemiLeptonic',
-                  #'DYJetsToLL_M50',
-                  #'DYJetsToLL_M10to50',
-                  #'WWTo2L2Nu',
-                  #'WZTo3LNu',
-                  #'WJetsToLNu',
-                  #'T_tch', 'Tbar_tch', 'TW','TbarW',
-                  #'ZZTo4L', 'ZZTo2Q2Nu', 
-                  #'GluGluToContinToZZTo2e2mu', 'GluGluToContinToZZTo2e2nu', 'GluGluToContinToZZTo2e2tau',
-                  #'GluGluToContinToZZTo2mu2nu','GluGluToContinToZZTo2mu2tau','GluGluToContinToZZTo4e',
-                  #'GluGluToContinToZZTo4mu', 'GluGluToContinToZZTo4tau',
-                  #'TTZToLLNuNu','TTZToLLNuNu_m1to10',
-                  #'TTWToLNu', 
-                  #'WWW','WWZ','WZZ','ZZZ','TTHnobb'
+    filterList = [#'WZTo2L2Q', 'ZZTo2L2Nu'
+                  'TTJets_SingleLeptonFromT','TTJets_SingleLeptonFromT','TTTo2L2Nu','TTToSemiLeptonic',
+                  'DYJetsToLL_M50',
+                  'DYJetsToLL_M10to50',
+                  'WWTo2L2Nu',
+                  'WZTo3LNu',
+                  'WJetsToLNu',
+                  'T_tch', 'Tbar_tch', 'TW','TbarW',
+                  'ZZTo4L', 'ZZTo2Q2Nu', 
+                  'GluGluToContinToZZTo2e2mu', 'GluGluToContinToZZTo2e2nu', 'GluGluToContinToZZTo2e2tau',
+                  'GluGluToContinToZZTo2mu2nu','GluGluToContinToZZTo2mu2tau','GluGluToContinToZZTo4e',
+                  'GluGluToContinToZZTo4mu', 'GluGluToContinToZZTo4tau',
+                  'TTZToLLNuNu','TTZToLLNuNu_m1to10',
+                  'TTWToLNu', 
+                  'WWW','WWZ','WZZ','ZZZ','TTHnobb'
     ]
     filterOut = ['DYJetsToLL_M50_1J','DYJetsToLL_M50_2J']
     for samp in mcSamples:
@@ -83,37 +83,40 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
         from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2018 import triggers2018
         
         selectedSamples = dataSamples
+        filtered = [] 
+        for samp in selectedSamples:
+            if '2017D' not in samp.name: continue
+            filtered.append( samp)
+        selectedSamples = filtered
+
 
         DatasetsAndTriggersMap = {}; DatasetsAndVetosMap = {} 
         DatasetsAndTriggersMap = {}; DatasetsAndVetosMap = {} 
         yeartriggers = eval('triggers%d'%doYear)
 
         if doYear in [2016, 2017]:
+            # DoubleMuon > DoubleEG> MuonEG
+            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
             DatasetsAndTriggersMap["DoubleEG"       ] = yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso']
             DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso']
-            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
-            DatasetsAndTriggersMap["SingleMuon"     ] = yeartriggers['triggers_1mu_iso']
-            DatasetsAndTriggersMap["SingleElectron" ] = yeartriggers['triggers_1e_iso']
             DatasetsAndTriggersMap["MET" ] = []
         
-            DatasetsAndVetosMap["DoubleEG"      ] = []
+            DatasetsAndVetosMap["DoubleMuon"    ] = [] 
+            DatasetsAndVetosMap["DoubleEG"      ] = DatasetsAndTriggersMap["DoubleMuon"  ] + DatasetsAndVetosMap["DoubleMuon"  ] 
             DatasetsAndVetosMap["MuonEG"        ] = DatasetsAndTriggersMap["DoubleEG"  ] + DatasetsAndVetosMap["DoubleEG"  ] 
-            DatasetsAndVetosMap["DoubleMuon"    ] = DatasetsAndTriggersMap["MuonEG"  ] + DatasetsAndVetosMap["MuonEG"  ] 
-            DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["DoubleMuon"    ] + DatasetsAndVetosMap["DoubleMuon"    ] 
-            DatasetsAndVetosMap["SingleElectron"] = DatasetsAndTriggersMap["SingleMuon"] + DatasetsAndVetosMap["SingleMuon"] 
             DatasetsAndVetosMap["MET"] = [] 
         
         else: 
+            # DoubleMuon > EGamma > MuonEG
+            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
             DatasetsAndTriggersMap["EGamma"         ] = yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso'] + yeartriggers['triggers_1e_iso']
             DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso']
-            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
-            DatasetsAndTriggersMap["SingleMuon"     ] = yeartriggers['triggers_1mu_iso']
             DatasetsAndTriggersMap["MET" ] = []
         
-            DatasetsAndVetosMap["EGamma"        ] = []
-            DatasetsAndVetosMap["MuonEG"        ] = DatasetsAndTriggersMap["EGamma"    ] + DatasetsAndVetosMap["EGamma"  ] 
-            DatasetsAndVetosMap["DoubleMuon"    ] = DatasetsAndTriggersMap["MuonEG"] + DatasetsAndVetosMap["MuonEG"] 
-            DatasetsAndVetosMap["SingleMuon"    ] = DatasetsAndTriggersMap["DoubleMuon"    ] + DatasetsAndVetosMap["DoubleMuon"    ] 
+            DatasetsAndVetosMap["DoubleMuon"    ] = []
+            DatasetsAndVetosMap["EGamma"        ] = DatasetsAndTriggersMap["DoubleMuon"] + DatasetsAndVetosMap["DoubleMuon"] 
+            DatasetsAndVetosMap["MuonEG"        ] = DatasetsAndTriggersMap["EGamma"    ] + DatasetsAndVetosMap["EGamma"    ] 
+
             DatasetsAndVetosMap["MET"] = [] 
 
     
@@ -217,22 +220,6 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         ## add xsection flag
         addFlags.flags.append(  (('xsec','F'), lambda ev : sampOpt['xsec'] ))
     
-    # applying jecs on top of 2018 
-    if sampOpt['isData']:
-        if sampOpt['year'] == '2018': 
-            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import jetRecalib2018A, jetRecalib2018B, jetRecalib2018C, jetRecalib2018D
-            if 'Run2018A' in sampOpt['name']:
-                jmeUncert = jetRecalib2018A()
-            elif 'Run2018B' in sampOpt['name']:
-                jmeUncert = jetRecalib2018B()
-            elif 'Run2018C' in sampOpt['name']:
-                jmeUncert = jetRecalib2018C()
-            elif 'Run2018D' in sampOpt['name']:
-                jmeUncert = jetRecalib2018D()
-            else: raise RuntimeError('I dont know the era for sample %s'%sampOpt['name'])
-
-            mod.extend([jmeUncert])
-
 
                    
     mod.append(addFlags)

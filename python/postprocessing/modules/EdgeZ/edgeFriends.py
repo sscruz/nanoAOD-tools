@@ -38,7 +38,7 @@ class edgeFriends:
         self.label = "" if (label in ["",None]) else ("_"+label)
         self.cleanJet = cleanJet
         self.year     = year
-        
+        self.debug    = False
 
         ###################################### B-tagging stuff to be included here
         self.f_btag_eff      = ROOT.TFile(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/btagEffs_Nanov4.root")
@@ -82,16 +82,6 @@ class edgeFriends:
                     ("lumi"+label, "I"),
                     ("nVert"+label, "I"),
                     ("nTrueInt"+label, "F"),
-                    ("Flag_HBHENoiseFilter"+label, "O"),
-                    ("Flag_HBHENoiseIsoFilter"+label, "O"),
-                    ("Flag_EcalDeadCellTriggerPrimitiveFilter"+label, "O"),
-                    ("Flag_goodVertices"+label, "O"),
-                    ("Flag_eeBadScFilter"+label, "O"),
-                    ("Flag_ecalBadCalibFilter"+label, "O"),
-                    ("Flag_globalTightHalo2016Filter"+label, "O"),
-                    ("Flag_globalSuperTightHalo2016Filter"+label, "O"),
-                    ("Flag_badChargedHadronFilter"+label, "O"),
-                    ("Flag_badMuonFilter"+label, "O"),
                     ("nLepTight"+label, "I"),
                     ("nLepLoose"+label, "I"),
                     ("nJetSel"+label, "I"),
@@ -101,7 +91,6 @@ class edgeFriends:
                     ("nFatJetSel_jecUp"+label, "I"),
                     ("nFatJetSel_jecDn"+label, "I"),
                     ("nTauSel"+label,"I"),
-                    #("nEdgeIsoTracks"+label, "I"),
                     ("rightMjj"+label, "F"),
                     ("bestMjj"+label, "F"),
                     ("minMjj"+label, "F"),
@@ -116,10 +105,8 @@ class edgeFriends:
                     ("j1MetDPhi"+label, "F"),
                     ("j2MetDPhi"+label, "F"),
                     ("nPairLep"+label, "I"),
-                    #("iLT"+label,"I",20,"nLepTight"+label), 
                     ("iJ"+label,"I",20,"nJetSel"+label), 
                     ("iFJ"+label,"I",20,"nFatJetSel"+label),
-                    #("nLepGood20"+label, "I"),
                     ("nJet35"+label, "I"),
                     ("nJet35_jecUp"+label, "I"),
                     ("nJet35_jecDn"+label, "I"),
@@ -176,47 +163,29 @@ class edgeFriends:
                     ("Lep1_pt"+label, "F"), 
                     ("Lep1_eta"+label, "F"), 
                     ("Lep1_phi"+label, "F"),
-                    #("Lep1_miniPFRelIso_all"+label, "F"),
-                    #("Lep1_pfRelIso03_all"+label, "F"),
-                    #("Lep1_pfRelIso04_all"+label, "F"),
-                    #("Lep1_dxy"+label, "F"),
-                    #("Lep1_dz"+label, "F"),
-                    #("Lep1_sip3d"+label, "F"),
                     ("Lep1_pdgId"+label, "I"), 
                     ("Lep1_tightCharge"+label, "F"), 
-                    #("Lep1_mvaFall17V1Iso"+label, "F"),
-                    #("Lep1_mvaFall17V1noIso"+label, "F"),
                     ("Lep1_genPartFlav"+label, "I"), 
-                    #("Lep1_minTauDR"+label, "F"),              
                     ("Lep2_pt"+label, "F"), 
                     ("Lep2_eta"+label, "F"),
                     ("Lep2_phi"+label, "F"),
-                    # ("Lep2_miniPFRelIso_all"+label, "F"),
-                    # ("Lep2_pfRelIso03_all"+label, "F"),
-                    # ("Lep2_pfRelIso04_all"+label, "F"),
-                    # ("Lep2_dxy"+label, "F"),
-                    # ("Lep2_dz"+label, "F"),
-                    # ("Lep2_sip3d"+label, "F"),
                     ("Lep2_pdgId"+label, "I"),
                     ("Lep2_tightCharge"+label, "F"),
-                    #("Lep2_mvaFall17V1Iso"+label, "F"),
-                    #("Lep2_mvaFall17V1noIso"+label, "F"),
                     ("Lep2_genPartFlav"+label, "I"), 
-                    #("Lep2_minTauDR"+label, "F"),      
+                    ("nLepSelLoose"+label, "I"), 
+                    {"name" : "LepSelLoose_pt"+label     , "rootBranchType" : "F", "lenVar" : "nLepSelLoose"+label}, 
+                    {"name" : "LepSelLoose_eta"+label    , "rootBranchType" : "F", "lenVar" : "nLepSelLoose"+label}, 
+                    {"name" : "LepSelLoose_phi"+label    , "rootBranchType" : "F", "lenVar" : "nLepSelLoose"+label},
+                    {"name" : "LepSelLoose_pdgId"+label  , "rootBranchType" : "I", "lenVar" : "nLepSelLoose"+label}, 
+                    {"name" : "LepSelLoose_pdgId"+label  , "rootBranchType" : "I", "lenVar" : "nLepSelLoose"+label}, 
+                    {"name" : "LepSelLoose_isTight"+label, "rootBranchType" : "I", "lenVar" : "nLepSelLoose"+label}, 
                     ("PileupW"+label, "F"), 
                     ("PileupW_Up"+label, "F"),
                     ("PileupW_Dn"+label, "F"), 
-                    # ("min_mlb1"+label, "F"),
-                    # ("min_mlb2"+label, "F"),
-                    # ("min_mlb1Up"+label, "F"),
-                    # ("min_mlb2Up"+label, "F"),
-                    # ("min_mlb1Dn"+label, "F"),
-                    # ("min_mlb2Dn"+label, "F"),
                     ("sum_mlb"+label, "F"), 
                     ("sum_mlbUp"+label, "F"),
                     ("sum_mlbDn"+label, "F"),
                     ("st"+label,"F"), 
-                    #("srID"+label, "I"), 
                     ("mT_lep1"+label, "F"),
                     ("mT_lep2"+label, "F"),
                     ("mT_dilep"+label, "F"),
@@ -248,8 +217,16 @@ class edgeFriends:
                     ('mbb_jecDn'+label, 'F'),
                     ('FS_central_jets'+label, 'F'),
                     ('FS_central_jets_jecUp'+label, 'F'),
-                    ('FS_central_jets_jecDn'+label, 'F')                    
-                 ]
+                    ('FS_central_jets_jecDn'+label, 'F'),
+                    ('mZ1_loose'+label, 'F'),
+                    ('mZ2_loose'+label, 'F'),
+                    ('ptZ1_loose'+label, 'F'),
+                    ('ptZ2_loose'+label, 'F'),
+                    ('phiZ1_loose'+label, 'F'),
+                    ('phiZ2_loose'+label, 'F'),
+                    ('minMll_loose' + label ,'F'),
+                    ('mindeltaR_loose' + label, 'F'),
+        ]
 
         ################## SUSY massess  
         for mass in self.susymasslist:
@@ -280,7 +257,13 @@ class edgeFriends:
 
 
         for var in biglist:
-            self.out.branch( *var ) 
+            if type(var) == list or type(var) == tuple:
+                self.out.branch( *var ) 
+            elif type(var) == dict:
+                self.out.branch( **var ) 
+            else:
+                print "Variable type for var is wrong in:", var
+                raise RuntimeError 
 
         self.biglist = biglist
         
@@ -288,8 +271,8 @@ class edgeFriends:
         pass
 
     def analyze(self, event):
-
-
+        synch = True
+        self.debug = (event.event == 65627548)
 
         isData = event.isData
         ##### MC variables
@@ -305,11 +288,13 @@ class edgeFriends:
 
         ################### Definition of good leptons (this goes first so skim is done first)
         lepst = []
+        lepsl = []
         nLepLoose = 0
         for il,lep in enumerate(leps):
             if not _susyEdgeLoose(lep, self.year): 
                 continue
             nLepLoose += 1 
+            lepsl.append(lep)
             if not _susyEdgeTight(lep, self.year): 
                 continue
             lepst.append(lep)
@@ -325,23 +310,82 @@ class edgeFriends:
 
         lepst = filter(lambda x : x.pt > 20, lepst)
         lepst.sort(key = lambda x : x.pt, reverse=True)
+
+        lepsl = filter( lambda x : x.pt > 15, lepsl)
+        lepsl.sort(key = lambda x : x.pt, reverse=True)
+
         nLepTight = len(lepst)
-        
+
+        mZ1_loose = -99
+        mZ2_loose = -99
+        minMll_loose    = 1000
+        mindeltaR_loose = 1000
+        ptZ1_loose = -99
+        ptZ2_loose = -99
+        phiZ1_loose = -99
+        phiZ2_loose = -99
+        mzs = []
+        for i1, l1 in enumerate(lepsl):
+            for i2,l2 in enumerate(lepsl):
+                if i1 <= i2: continue
+                deltaR = l1.p4().DeltaR( l2.p4() )
+                mll    = (l1.p4()+l2.p4()).M()
+                if mll < minMll_loose:
+                    minMll_loose = mll
+                if deltaR < mindeltaR_loose:
+                    mindeltaR_loose = deltaR
+
+                if l1.pdgId*l2.pdgId not in [-121,-169]: continue
+                mzs.append( ((l1.p4()+l2.p4()).M(), i1, i2))
+
+
+        mzs.sort( key  = lambda x : abs(x[0]-91.2) ) 
+        if len(mzs) > 0: 
+            mZ1_loose = mzs[0][0]
+            ptZ1_loose  = (lepsl[mzs[0][1]].p4()+lepsl[mzs[0][2]].p4()).Pt()
+            phiZ1_loose = (lepsl[mzs[0][1]].p4()+lepsl[mzs[0][2]].p4()).Phi()
+            i1 = mzs[0][1]; i2 = mzs[0][2]
+            toremove = [] 
+            for mz in mzs: 
+                if mz[1] == i1 or mz[1] == i2 or mz[2] == i1 or mz[2] == i2: toremove.append(mz)
+            for mz in toremove: mzs.remove(mz)
+        if len(mzs) > 0: 
+            mZ2_loose = mzs[0][0]
+            ptZ2_loose  = (lepsl[mzs[0][1]].p4()+lepsl[mzs[0][2]].p4()).Pt()
+            phiZ2_loose = (lepsl[mzs[0][1]].p4()+lepsl[mzs[0][2]].p4()).Phi()
+
+        self.out.fillBranch('mZ1_loose'+self.label, mZ1_loose)
+        self.out.fillBranch('ptZ1_loose' +self.label, ptZ1_loose )
+        self.out.fillBranch('ptZ2_loose' +self.label, ptZ2_loose )
+        self.out.fillBranch('phiZ1_loose'+self.label, phiZ1_loose)
+        self.out.fillBranch('phiZ2_loose'+self.label, phiZ2_loose)
+
+        self.out.fillBranch('mZ2_loose'+self.label, mZ2_loose)
+        self.out.fillBranch('minMll_loose' + self.label   ,  minMll_loose    ) 
+        self.out.fillBranch('mindeltaR_loose' + self.label,  mindeltaR_loose )
+
+
         if nLepTight < 2: return False
         self.out.fillBranch('nLepTight'        + self.label, nLepTight)
         self.out.fillBranch('nLepLoose'        + self.label, nLepLoose)
+        self.out.fillBranch('nLepSelLoose'     + self.label, len(lepsl))
+        for l in lepsl:
+            setattr(l, 'isTight', _susyEdgeTight(l,event.year))
 
+        for var in 'pt,eta,phi,pdgId,isTight'.split(','):
+            looselepret = [] 
+            for l in lepsl: 
+                looselepret.append( getattr(l, var))
+            self.out.fillBranch( "LepSelLoose_%s"%(var)+self.label, looselepret)
 
         # jet stuff 
 
         jetsc    = [j for j in Collection(event,"Jet","nJet")]
         fatjetsc = [fj for fj in Collection(event,"FatJet","nFatJet")] 
         
-        if self.year == 2018:
-            jetsc = self.smearJets(jetsc,0)
-
     
-        if not isData: 
+        if not isData and not synch: 
+            jetsc = self.smearJets(jetsc,0)
             genparts = [g for g in Collection(event,"GenPart","nGenPart")]
             genjets = [j for j in Collection(event, "GenJet", "nGenJet")] # Atencion
 
@@ -362,11 +406,13 @@ class edgeFriends:
             fatjetsc_jecDn = []
 
         ################## Treatment of n of true events
-        if not isData:
-            ntrue = event.Pileup_nTrueInt
+
 
         ################## Treatment of MET
         (met, metphi)  = (event.METFixEE2017_pt, event.METFixEE2017_phi) if (event.year == 2017) else (event.MET_pt, event.MET_phi)
+        if not isData and not synch:
+            ntrue = event.Pileup_nTrueInt
+            (met, metphi) = (event.METFixEE2017_pt_nom, event.METFixEE2017_phi_nom) if (event.year == 2017) else (event.MET_pt_nom, event.MET_phi_nom)
         metp4 = ROOT.TLorentzVector()
         metp4.SetPtEtaPhiM(met, 0, metphi, 0)
         metp4obj = ROOT.TLorentzVector()
@@ -416,17 +462,6 @@ class edgeFriends:
             self.out.fillBranch(mass + self.label, masses[mass])
         self.isSMS =  (masses['GenSusyMScan1'] > 0 or masses['GenSusyMNeutralino2'] > 0)
 
-        ################### Filters stuff
-        self.out.fillBranch('Flag_HBHENoiseFilter'                     + self.label ,event.Flag_HBHENoiseFilter                    )
-        self.out.fillBranch('Flag_HBHENoiseIsoFilter'                  + self.label ,event.Flag_HBHENoiseIsoFilter                 )
-        self.out.fillBranch('Flag_EcalDeadCellTriggerPrimitiveFilter'  + self.label ,event.Flag_EcalDeadCellTriggerPrimitiveFilter )
-        self.out.fillBranch('Flag_goodVertices'                        + self.label ,event.Flag_goodVertices                       )
-        self.out.fillBranch('Flag_eeBadScFilter'                       + self.label ,event.Flag_eeBadScFilter                      )
-        self.out.fillBranch('Flag_ecalBadCalibFilter'                  + self.label ,event.Flag_ecalBadCalibFilter                 )
-        self.out.fillBranch('Flag_globalTightHalo2016Filter'           + self.label ,event.Flag_globalTightHalo2016Filter          )
-        self.out.fillBranch('Flag_badMuonFilter'                       + self.label ,event.Flag_BadPFMuonFilter                    )
-        self.out.fillBranch("Flag_badChargedHadronFilter"              + self.label ,event.Flag_BadChargedCandidateFilter          )
-        self.out.fillBranch("Flag_badMuonFilter"                       + self.label ,event.Flag_BadPFMuonFilter                    )
         
         ################### Isotracks stuff
         self.out.fillBranch('nPFLep5'  + self.label, event.nPFLep5 )       
@@ -494,10 +529,10 @@ class edgeFriends:
         #     else:
         #         lepret["Lep1_"+lfloat+self.label] = -42.
         #         lepret["Lep2_"+lfloat+self.label] = -42.
+        lepret = {} 
         if nLepTight > 1: 
             nPairLep = 2
             lcount = 1
-            lepret = {} 
             for lep in [lepst[0],lepst[1]]:
                 for lfloat in 'pt eta phi pdgId tightCharge'.split(): # dxy dz sip3d pfRelIso03_all pfRelIso04_all mvaFall17V1Iso mvaFall17V1noIso miniPFRelIso_all 
                     if lfloat == 'genPartFlav' and isData:
@@ -977,12 +1012,14 @@ class edgeFriends:
     def setFatJetCollection(self, fatjetcoll, jetcoll, lepst):
         ret = []
         for f in fatjetcoll:
+            if self.debug: print 'We have a fatjet', f.pt, f.eta
             f._clean = True
             if abs(f.eta) > 2.4 or f.pt < 25.:
                 f._clean = False
                 continue
             for l in lepst:
-                if deltaR(l,f) < 0.4:
+                if deltaR(l,f) < 0.8:
+                    if self.debug: print '... its cleaned with', l.pt, l.eta
                     f._clean = False
             if f._clean:
                 ret.append(f)
@@ -1332,12 +1369,11 @@ class edgeFriends:
 
 
 def _susyEdgeLoose(lep,year):
-    
     leppt = lep.pt # ecorr is corrected above
 
     if leppt <= 5.: return False # Atencion before 10.
-    if abs(lep.dxy) > 0.2: return False
-    if abs(lep.dz ) > 0.5: return False
+    if abs(lep.dxy) > 0.05: return False
+    if abs(lep.dz ) > 0.1: return False
     if lep.sip3d > 8: return False
     lepeta = abs(lep.eta)
     if lep.miniPFRelIso_all > 0.4: return False
@@ -1349,8 +1385,7 @@ def _susyEdgeLoose(lep,year):
     ## electrons
     if abs(lep.pdgId) == 11:
         if lepeta > 2.4: return False
-        if (lep.convVeto == 0) or (lep.lostHits == 1): return False
-            
+        if (lep.convVeto == 0) or (lep.lostHits != 0): return False
         if year == 2016: return mvaID2016VLoose(lep)
         if year == 2017: return mvaID2017VLoose(lep)
         if year == 2018: return mvaID2018VLoose(lep)
@@ -1374,10 +1409,9 @@ def getSelectedTaus(alltaus,leps):
     return taus
 
 def _susyEdgeTight(lep,year):
-    
+
     leppt = lep.pt # /lep.eCorr if not lep.eCorr == 0 and lep.doCorrections == False else lep.pt# If not energy corrections applied 
     #leppt = lep.pt # If energy corrections applied
-
     if leppt < 10.: return False # pt > 20 applied after tau cleaning is made
     eta = abs(lep.eta)
     if eta          > 2.4: return False
@@ -1385,6 +1419,7 @@ def _susyEdgeTight(lep,year):
     if abs(lep.dz ) > 0.10: return False
     if lep.sip3d > 8: return False
     if eta > 1.4 and eta < 1.6: return False
+
     if abs(lep.pdgId) == 13:
         ## old medium ID if lep.mediumMuonId != 1: return False
         if not lep.mediumId: return False
@@ -1392,13 +1427,15 @@ def _susyEdgeTight(lep,year):
         ##if not lep.tightId: return False # Atencion
     if abs(lep.pdgId) == 11:
         # MVA definition:
-        etatest = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
+        # etatest = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
         #etatest = (abs(lep.etaSc) if hasattr(lep, 'etaSc') else abs(lep.eta))
-        if (etatest > 1.4442 and etatest < 1.566) : return False
+        #if (etatest > 1.4442 and etatest < 1.566) : return False
 
         if (lep.convVeto == 0) or (lep.lostHits > 0) : return False
+
         #if leppt < 10.: return False
         if lep.miniPFRelIso_all >= 0.1: return False
+
         if   year == 2016: 
             if not mvaID2016Tight(lep): return False
         elif year == 2017: 
@@ -1433,7 +1470,7 @@ def mvaID2016VLoose(lep):
         if leppt>=25.:
             if not raw > -0.112: return False
 
-    if lepeta > 1.479 and lepeta < 2.4:
+    if lepeta > 1.479:
         if leppt>5. and leppt<10.:
             if not raw > 0.071: return False
         if leppt>10. and leppt<25.:
@@ -1465,7 +1502,7 @@ def mvaID2017VLoose(lep):
         if leppt>=25.:
             if not lep.mvaFall17V1noIso > -0.775: return False
 
-    if lepeta > 1.479 and lepeta < 2.4:
+    if lepeta > 1.479:
         if leppt>5. and leppt<10.:
             if not lep.mvaFall17V1noIso > 0.176: return False
         if leppt>10. and leppt<25.:
@@ -1497,7 +1534,7 @@ def mvaID2018VLoose(lep):
         if leppt>=25.:
             if not raw > 0.084: return False
 
-    if lepeta > 1.479 and lepeta < 2.4:
+    if lepeta > 1.479:
         if leppt>5. and leppt<10.:
             if not raw > 0.362: return False
         if leppt>10. and leppt<25.:
@@ -1518,26 +1555,27 @@ def mvaID2016Tight(lep):
 
 
     if lepeta < 0.8:
-        if leppt<25.:
+        if leppt<40.:
             if not raw > (3.447 + 0.063*(leppt - 25)): return False
-        if leppt>=25.:
+        if leppt>=40.:
             if not raw > 4.392: return False
 
     if lepeta > 0.8 and lepeta < 1.479:
-        if leppt<25.:
+        if leppt<40.:
             if not raw > (2.522 + 0.058*(leppt - 25)): return False
-        if leppt>=25.:
+        if leppt>=40.:
             if not raw > 3.392: return False
 
-    if lepeta > 1.479 and lepeta < 2.4:
-        if leppt<25.:
+    if lepeta > 1.479:
+        if leppt<40.:
             if not raw > (1.555 + 0.075*(leppt - 25)): return False
-        if leppt>=25.:
+        if leppt>=40.:
             if not raw > 2.680: return False
     return True
 
 
 def mvaID2017Tight(lep):
+    
     # https://twiki.cern.ch/twiki/pub/CMS/SUSLeptonSF/Run2_SUSYwp_EleCB_MVA_8Jan19.pdf
     lepeta = abs(lep.eta + lep.deltaEtaSC) # Using supercluster Eta for electrons
     leppt = lep.pt
@@ -1553,7 +1591,7 @@ def mvaID2017Tight(lep):
         if leppt>=25.:
             if not lep.mvaFall17V1noIso > 0.475: return False
 
-    if lepeta > 1.479 and lepeta < 2.4:
+    if lepeta > 1.479:
         if  leppt<25.:
             if not lep.mvaFall17V1noIso > (-0.1+0.028*(leppt-10)): return False
         if leppt>=25.:
@@ -1580,7 +1618,7 @@ def mvaID2018Tight(lep):
         if leppt>=25.:
             if not raw > 3.152: return False
 
-    if lepeta > 1.479 and lepeta < 2.4:
+    if lepeta > 1.479:
         if  leppt<25.:
             if not raw > ( 2.359 + 0.087*(leppt - 25)): return False
         if leppt>=25.:
