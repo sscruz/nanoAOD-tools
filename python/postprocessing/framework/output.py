@@ -74,8 +74,11 @@ class FullOutput(OutputTree):
             branchSelection=None,
             outputbranchSelection=None,
             fullClone=False,
+            maxEntries=None,
+            firstEntry=0,
             provenance=False,
-            jsonFilter=None
+            jsonFilter=None,
+            keepFriendLinks=False
     ):
         outputFile.cd()
 
@@ -85,7 +88,7 @@ class FullOutput(OutputTree):
             outputbranchSelection.selectBranches(inputTree)
 
         if fullClone:
-            outputTree = inputTree.CopyTree('1')
+            outputTree = inputTree.CopyTree('1', "", maxEntries if maxEntries else ROOT.TVirtualTreePlayer.kMaxEntries, firstEntry)
         else:            
             outputTree = inputTree.CloneTree(0)
         #if(outputTree.GetName() == "Events"): outputTree.SetName("tree")
@@ -105,10 +108,10 @@ class FullOutput(OutputTree):
             if kn == "Events":
                 continue # this we are doing
             elif kn in ("MetaData", "ParameterSets"):
-                if provenance: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1')
+                if provenance: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1' if firstEntry == 0 else '0') # treat content of other trees as if associated to event 0
             elif kn in ("LuminosityBlocks", "Runs"):
-                if not jsonFilter: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1')
-                else:
+                if not jsonFilter: self._otherTrees[kn] = inputFile.Get(kn).CopyTree('1' if firstEntry == 0 else '0')
+                elif firstEntry == 0:
                     _isRun = (kn=="Runs")
                     _it = inputFile.Get(kn)
                     _ot = _it.CloneTree(0)
@@ -119,15 +122,22 @@ class FullOutput(OutputTree):
                 print "Not copying unknown tree %s" % kn
             else:
                 self._otherObjects[kn] = inputFile.Get(kn)
+        self._keepFriendLinks = False # detatch friend trees before saving to the output file, otherwise they remain linked
     def fill(self):
         self._inputTree.readAllBranches()
         self._tree.Fill()
     def write(self):
+        if not self._keepFriendLinks: self._unlinkFriends()
         OutputTree.write(self)
         for t in self._otherTrees.itervalues():
             t.Write()
         for on,ov in self._otherObjects.iteritems():
             self._file.WriteTObject(ov,on)
+    def _unlinkFriends(self):
+        friends = self._tree.GetListOfFriends() or []
+        while friends and friends.GetSize() > 0:
+            self._tree.RemoveFriend(friends.At(0).GetTree())
+            friends = self._tree.GetListOfFriends() or []
 
 class FriendOutput(OutputTree):
     def __init__(self, inputFile, inputTree, outputFile, treeName="Friends"):

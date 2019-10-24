@@ -31,4 +31,4 @@ os.environ['IS_CRAB']="true"
 cfo = imp.load_source(options.cfg_file.rstrip('py'), options.cfg_file, handle)
 cfo.POSTPROCESSOR.run()
 
-
+print "DONE"
