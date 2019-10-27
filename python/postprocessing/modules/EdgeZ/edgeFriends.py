@@ -40,13 +40,6 @@ class edgeFriends:
         self.year     = year
         self.debug    = False
 
-        ###################################### B-tagging stuff to be included here
-        self.f_btag_eff      = ROOT.TFile(os.environ['CMSSW_BASE'] + "/src/PhysicsTools/NanoAODTools/data/edge/btaggingweights/btagEffs_Nanov4.root")
-        self.h_btag_eff_b    = copy.deepcopy(self.f_btag_eff.Get("h2_Eff_%d_btagDeepB_med_b"   %year))
-        self.h_btag_eff_c    = copy.deepcopy(self.f_btag_eff.Get("h2_Eff_%d_btagDeepB_med_c"   %year))
-        self.h_btag_eff_udsg = copy.deepcopy(self.f_btag_eff.Get("h2_Eff_%d_btagDeepB_med_udsg"%year))
-        self.f_btag_eff.Close()
-
         if self.year == 2016:
             self.btagMediumCut =  0.6321
             self.btagLooseCut  =  0.2217
@@ -58,14 +51,6 @@ class edgeFriends:
             self.btagLooseCut  =  0.1241
         else: raise RuntimeError('No year?')
 
-
-
-        ###################################### SUSY masses variable definition
-        self.susymasslist = ['GenSusyMScan1'     , 'GenSusyMScan2'      , 'GenSusyMScan3'      , 'GenSusyMScan4'      ,
-                             'GenSusyMGluino'    , 'GenSusyMGravitino'  , 'GenSusyMStop'       , 'GenSusyMSbottom'    ,
-                             'GenSusyMStop2'     , 'GenSusyMSbottom2'   , 'GenSusyMSquark'     ,
-                             'GenSusyMNeutralino', 'GenSusyMNeutralino2', 'GenSusyMNeutralino3', 'GenSusyMNeutralino4',
-                             'GenSusyMChargino'  , 'GenSusyMChargino2']
         
         ###################################### List of triggers
 
@@ -202,11 +187,6 @@ class edgeFriends:
                     ("mt2bb_jecDn"+label, "F"),
                     ("mt2bb_unclUp"+label, "F"),
                     ("mt2bb_unclDn"+label, "F"),
-                    ('weight_btagsf'         +label, "F"),
-                    ('weight_btagsf_heavy_UP'+label, "F"),
-                    ('weight_btagsf_heavy_DN'+label, "F"),
-                    ('weight_btagsf_light_UP'+label, "F"),
-                    ('weight_btagsf_light_DN'+label, "F"),
                     ("d3D" + label, "F"),
                     ("parPt" + label, "F"),
                     ("ortPt" + label, "F"),
@@ -229,15 +209,14 @@ class edgeFriends:
         ]
 
         ################## SUSY massess  
-        for mass in self.susymasslist:
-            biglist.append( ( '{tn}{lab}'.format(lab=label, tn=mass),'I') )
+        biglist.append( ( 'GenSusyMScan1{lab}'.format(lab=label),'I') )
+        biglist.append( ( 'GenSusyMScan2{lab}'.format(lab=label),'I') )
+
+            
          
         ################## IsoTrack stuff
         biglist.append(("nPFLep5"+label, 'I'))
         biglist.append(("nPFHad10"+label, 'I'))
-        
-        # for itfloat in "pt eta phi dxy dz pfRelIso03_chg pdgId".split():
-        #     biglist.append( ("EdgeIsoTracksSel"+label+"_"+itfloat,"F",20,"nEdgeIsoTracks"+label) )
         
         ################## Selected jets
         for jfloat in "pt eta phi mass btagDeepB rawFactor pt_jecUp pt_jecDn".split():
@@ -246,7 +225,7 @@ class edgeFriends:
         biglist.append( ("JetSel"+label+"_hadronFlavour","I",20,"nJetSel"+label) )
         biglist.append( ("JetSel"+label+"_genJetIdx","I",20,"nJetSel"+label) )
         ################## Selected Fat jets
-        for fjfloat in "pt eta phi mass btagDeepB msoftdrop tau1 tau2 tau3 pt_jecUp pt_jecDn".split(): # btagDeepB  # esto tiene que volver
+        for fjfloat in "pt eta phi mass btagDeepB msoftdrop tau1 tau2 tau3 pt_jecUp pt_jecDn".split(): 
             biglist.append( ("FatJetSel"+label+"_"+fjfloat,"F",20,"nFatJetSel"+label) ) #if self.isMC:
         for tfloat in "pt eta phi".split():
             biglist.append( ("TauSel{label}_{tfloat}".format(label=label,tfloat=tfloat),"F",20,"nTauSel"+label))
@@ -271,8 +250,7 @@ class edgeFriends:
         pass
 
     def analyze(self, event):
-        synch = True
-        self.debug = (event.event == 65627548)
+        #self.debug = (event.event == 65627548)
 
         isData = event.isData
         ##### MC variables
@@ -382,8 +360,7 @@ class edgeFriends:
 
         jetsc    = [j for j in Collection(event,"Jet","nJet")]
         fatjetsc = [fj for fj in Collection(event,"FatJet","nFatJet")] 
-        
-    
+        synch = False
         if not isData and not synch: 
             jetsc = self.smearJets(jetsc,0)
             genparts = [g for g in Collection(event,"GenPart","nGenPart")]
@@ -457,10 +434,12 @@ class edgeFriends:
 
         ################## SUSY masses stuff
         masses = {}
-        for mass in self.susymasslist:
-            masses[mass] = (-1 if not hasattr(event, mass) else getattr(event, mass) )
-            self.out.fillBranch(mass + self.label, masses[mass])
-        self.isSMS =  (masses['GenSusyMScan1'] > 0 or masses['GenSusyMNeutralino2'] > 0)
+        # TO DO !!
+        self.isSMS = False
+        #for mass in self.susymasslist:
+        #    masses[mass] = (-1 if not hasattr(event, mass) else getattr(event, mass) )
+        #    self.out.fillBranch(mass + self.label, masses[mass])
+        #self.isSMS =  (masses['GenSusyMScan1'] > 0 or masses['GenSusyMNeutralino2'] > 0)
 
         
         ################### Isotracks stuff
@@ -916,23 +895,6 @@ class edgeFriends:
         self.out.fillBranch('j1MetDPhi'  + self.label, deltaPhi(metphi, theJets[0].phi) if len(theJets) > 0 else -99.)
         self.out.fillBranch('j2MetDPhi'  + self.label, deltaPhi(metphi, theJets[1].phi) if len(theJets) > 1 else -99.)
          
-        [wtbtag, wtbtagUp_heavy, wtbtagUp_light, wtbtagDown_heavy, wtbtagDown_light] = (self.getWeightBtag(theJets) if not isData else [1., 1., 1., 1., 1.])
-
-        ################### Applying the trigger weights
-        # we can apply these guys on the fly :) 
-        #ret['weight_trigger'] = 1.
-        #if not isData:
-        #    if abs(lepret["Lep1_pdgId"+self.label] * lepret["Lep2_pdgId"+self.label]) == 169: ret['weight_trigger'] = 0.94
-        #    if abs(lepret["Lep1_pdgId"+self.label] * lepret["Lep2_pdgId"+self.label]) == 143: ret['weight_trigger'] = 0.89
-        #    if abs(lepret["Lep1_pdgId"+self.label] * lepret["Lep2_pdgId"+self.label]) == 121: ret['weight_trigger'] = 0.97
-
-        ################### Applying the b-tagging weights
-        self.out.fillBranch('weight_btagsf'          + self.label, wtbtag          )
-        self.out.fillBranch('weight_btagsf_heavy_UP' + self.label, wtbtagUp_heavy  )
-        self.out.fillBranch('weight_btagsf_heavy_DN' + self.label, wtbtagDown_heavy)
-        self.out.fillBranch('weight_btagsf_light_UP' + self.label, wtbtagUp_light  )
-        self.out.fillBranch('weight_btagsf_light_DN' + self.label, wtbtagDown_light)
-
         ################### MLB calculation
         jet = ROOT.TLorentzVector()
         min_mlb = 1e6
@@ -1311,58 +1273,6 @@ class edgeFriends:
        return h.GetBinContent(binx,biny)
     #################################################################################################################
 
-    def getWeightBtag(self, jets):
-
-        mcTag = 1.
-        mcNoTag = 1.
-        dataTag = 1.
-        dataNoTag = 1.
-        errHup   = 0
-        errHdown = 0
-        errLup   = 0
-        errLdown = 0
-
-        for jet in jets:
-
-            csv = jet.btagDeepB
-            mcFlavor = jet.hadronFlavour 
-            eta = jet.eta
-            pt = jet.pt
-
-            if(abs(eta) > 2.5): continue
-            if(pt < 20): continue
-            eff = self.getBtagEffFromFile(pt, eta, mcFlavor)
-
-            istag = csv > self.btagMediumCut and abs(eta) < 2.5 and pt > 20
-            SF = (jet.btagSF, jet.btagSF_up, jet.btagSF_down)
-            if(istag):
-                 mcTag = mcTag * eff
-                 dataTag = dataTag * eff * SF[0]
-                 if(mcFlavor == 5 or mcFlavor ==4):
-                     errHup  = errHup + (SF[1] - SF[0]  )/SF[0]
-                     errHdown = errHdown + (SF[0] - SF[2])/SF[0]
-                 else:
-                     errLup = errLup + (SF[1] - SF[0])/SF[0]
-                     errLdown = errLdown + (SF[0] - SF[2])/SF[0]
-            else:
-                 mcNoTag = mcNoTag * (1 - eff)
-                 dataNoTag = dataNoTag * (1 - eff*SF[0])
-                 if mcFlavor==5 or mcFlavor==4:
-                     errHup = errHup - eff*(SF[1] - SF[0]  )/(1-eff*SF[0])
-                     errHdown = errHdown - eff*(SF[0] - SF[2])/(1-eff*SF[0])
-                 else:
-                     errLup = errLup - eff*(SF[1] - SF[0])/(1-eff*SF[0])
-                     errLdown = errLdown - eff*(SF[0] - SF[2])/(1-eff*SF[0]);
-
-
-        wtbtag = (dataNoTag * dataTag ) / ( mcNoTag * mcTag )
-        wtbtagUp_heavy   = wtbtag*( 1 + errHup   )
-        wtbtagUp_light   = wtbtag*( 1 + errLup   )
-        wtbtagDown_heavy = wtbtag*( 1 - errHdown )
-        wtbtagDown_light = wtbtag*( 1 - errLdown )
-
-        return [wtbtag, wtbtagUp_heavy, wtbtagUp_light, wtbtagDown_heavy, wtbtagDown_light]
-    #################################################################################################################
 
 
 

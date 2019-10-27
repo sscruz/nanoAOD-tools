@@ -20,7 +20,8 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.EdgeZ.skimNRecoLeps import
 from PhysicsTools.NanoAODTools.postprocessing.modules.EdgeZ.isoTrackAnalysis import IsoTrackAnalysis
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.TriggerBitFilter import TriggerBitFilter
 from PhysicsTools.NanoAODTools.postprocessing.modules.EdgeZ.edgeFriends import edgeFriends, _susyEdgeTight, _susyEdgeLoose
-from PhysicsTools.NanoAODTools.postprocessing.modules.btv.btagSFProducer import btagSFProducer
+from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetHelperRun2 import createJMECorrector
+from PhysicsTools.NanoAODTools.postprocessing.modules.EdgeZ.susyReweight import susyReweight
 
 
 
@@ -35,6 +36,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import getCra
 
 doData=getCrabOption("doData",False)
 doYear=getCrabOption("doYear",0)
+doSMS =getCrabOption("doSMS",False)
 
 if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
 
@@ -49,6 +51,12 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
     from PhysicsTools.NanoAODTools.postprocessing.datasets.data2018  import samples as dataSamples2018
 
     mcSamples   = eval('mcSamples%d'%doYear)
+    if doSMS: 
+        from PhysicsTools.NanoAODTools.postprocessing.datasets.signals  import signals2016,signals2017,signals2018
+
+    
+        mcSamples = eval('signals%d'%doYear)
+
     dataSamples = eval('dataSamples%d'%doYear)
 
     filteredSamples = [] 
@@ -182,46 +190,23 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
 
     mod = [ goodLepProducer, skimRecoLeps, isoTrackAnalysis]
 
+    era = sampOpt['name'].split(sampOpt['year'])[1][0] # lol 
+    jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era) 
+    jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, jetType="AK8PFPuppi")
+    print 'missing jecs!!'
+    mod.extend([jmeUncert(),jmeUncertAK8()])
 
     if not sampOpt['isData']:
         # add pile-up weight before any skim
-        print 'the year is', sampOpt['year']
-        if sampOpt['year'] == '2017':
-            puAutoWeight = puAutoWeight()
-        elif sampOpt['year'] == '2018':
-            puAutoWeight = puAutoWeight2018()
-        elif sampOpt['year'] == '2016':
-            puAutoWeight  = puWeight()
-        btagWeightProducer      = btagSFProducer(sampOpt['year'],algo='deepcsv')
-        #btagWeightProducer_fast = btagSFProducer(sampOpt['year']+"_fast",algo='deepcsv',suffix='fast')
-
-        mod = [puAutoWeight,btagWeightProducer] + mod # + btagWeightProducer_fast
-
-        ## add jet met uncertainties
-        if sampOpt['year'] == '2017':
-            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017 as jetmetUncertainties
-            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017AK8chs as jetmetUncertaintiesAK8
-            jmeUncert    = jetmetUncertainties()
-            jmeUncertAK8 = jetmetUncertaintiesAK8()
-            jmeUncert.metBranchName = 'METFixEE2017' 
-        elif sampOpt['year'] == '2018':
-            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2018 as jetmetUncertainties
-            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2018AK8chs as jetmetUncertaintiesAK8
-            jmeUncertAK8 = jetmetUncertaintiesAK8()
-            jmeUncert = jetmetUncertainties()
-        elif sampOpt['year'] == '2016': 
-            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2016 as jetmetUncertainties
-            from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2016AK8chs as jetmetUncertaintiesAK8
-            jmeUncert = jetmetUncertainties()
-            jmeUncertAK8 = jetmetUncertaintiesAK8()
-
-        mod.extend([jmeUncert,jmeUncertAK8])
-
+        puAutoWeight  = eval('puAutoWeight_%s'%sampOpt['year'])
+        
+        mod = [puAutoWeight()] + mod
         ## add xsection flag
         addFlags.flags.append(  (('xsec','F'), lambda ev : sampOpt['xsec'] ))
-    
+        if sampOpt['scan']:
+            countScans = susyReweight( sampOpt['scan'] ) 
+            mod = [countScans] + mod
 
-                   
     mod.append(addFlags)
     # now adding the edge part at the end 
     mod.append(edgeFriends)
