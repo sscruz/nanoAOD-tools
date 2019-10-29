@@ -47,9 +47,6 @@ jerTagsMC = {'2016' : 'Summer16_25nsV1_MC',
 jmrValues = {'2016' : [1.0, 1.2, 0.8],
              '2017' : [1.09, 1.14, 1.04],
              '2018' : [1.09, 1.14, 1.04],        # Use 2017 values for 2018 until 2018 are released
-             '2016FastSim' : [1.0, 1.2, 0.8],   
-             '2017FastSim' : [1.09, 1.14, 1.04],            
-             '2018FastSim' : [1.09, 1.14, 1.04],
 }
 #jet mass scale
 #W-tagging PUPPI softdrop JMS values: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
@@ -57,9 +54,6 @@ jmrValues = {'2016' : [1.0, 1.2, 0.8],
 jmsValues = { '2016' : [1.00, 0.9906, 1.0094], #nominal, down, up
               '2017' : [0.982, 0.978, 0.986],
               '2018' : [0.982, 0.978, 0.986], # Use 2017 values for 2018 until 2018 are released
-              '2016FastSim' : [1.00, 0.9906, 1.0094], #nominal, down, up
-              '2017FastSim' : [0.982, 0.978, 0.986],
-              '2018FastSim' : [0.982, 0.978, 0.986] # Use 2017 values for 2018 until 2018 are released
             }
 
 def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False, metBranchName="MET", isFastSim=False):

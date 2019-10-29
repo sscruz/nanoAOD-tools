@@ -84,7 +84,6 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
             if filt in samp.name: filteredSamples.append(samp)
     mcSamples = filteredSamples
     
-    
     if doData:
         from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2016 import triggers2016
         from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import triggers2017
@@ -93,7 +92,7 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
         selectedSamples = dataSamples
         filtered = [] 
         for samp in selectedSamples:
-            if '2017D' not in samp.name: continue
+            if '2017D' not in samp.name and '2018B' not in samp.name and '2016C' not in samp.name: continue
             filtered.append( samp)
         selectedSamples = filtered
 
@@ -182,18 +181,16 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
                                                   ]),
                                        store=False
     )
-
     edgeFriends = edgeFriends("Edge", lambda lep : _susyEdgeTight(lep,int(sampOpt['year'])),
                               cleanJet = lambda lep,jet,dr : (jet.pt < 35 and dr < 0.4),
-                              year = int(sampOpt['year'])
+                              year = int(sampOpt['year']), isSMS=sampOpt['scan'] 
     )
 
     mod = [ goodLepProducer, skimRecoLeps, isoTrackAnalysis]
     
-    yearflag=  sampOpt['year'] + 'FastSim' if sampOpt['isFastSim'] else ''
     era = sampOpt['name'].split(sampOpt['year'])[1][0] if sampOpt['isData'] else '' # lol 
-    jmeUncert = createJMECorrector( not sampOpt['isData'], yearflag, era) 
-    jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], yearflag, era, jetType="AK8PFPuppi" if yearflag != '2016FastSim' else 'AK8PFchs')
+    jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, sampOpt['isFastSim']) 
+    jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, jetType="AK8PFPuppi" if yearflag != '2016FastSim' else 'AK8PFchs')
     mod.extend([jmeUncert(),jmeUncertAK8()])
 
     if not sampOpt['isData']:
