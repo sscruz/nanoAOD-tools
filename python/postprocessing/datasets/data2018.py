@@ -44,3 +44,4 @@ for sample in samples:
     sample.options['year']   = '2018'
     sample.name = sample.name + '_2018'
     sample.options['scan'] = None
+    sample.options['isFastSim'] = False
