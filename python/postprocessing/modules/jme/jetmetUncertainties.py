@@ -135,7 +135,7 @@ class jetmetUncertaintiesProducer(Module):
 
     def endJob(self):
         self.jetSmearer.endJob()
-        shutil.rmtree(self.jesInputFilePath)
+        #shutil.rmtree(self.jesInputFilePath)
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
