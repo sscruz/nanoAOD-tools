@@ -189,8 +189,8 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     mod = [ goodLepProducer, skimRecoLeps, isoTrackAnalysis]
     
     era = sampOpt['name'].split(sampOpt['year'])[1][0] if sampOpt['isData'] else '' # lol 
-    jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, sampOpt['isFastSim']) 
-    jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, jetType="AK8PFPuppi" if yearflag != '2016FastSim' else 'AK8PFchs')
+    jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, isFastSim=sampOpt['isFastSim']) 
+    jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, jetType="AK8PFPuppi" if (sampOpt['year'] != '2016' or not sampOpt['isFastSim']) else 'AK8PFchs',isFastSim=sampOpt['isFastSim'])
     mod.extend([jmeUncert(),jmeUncertAK8()])
 
     if not sampOpt['isData']:

@@ -34,11 +34,12 @@ def computeMT2(visaVec, visbVec, metVec):
 
 
 class edgeFriends:
-    def __init__(self, label, tightLeptonSel, cleanJet, year):
+    def __init__(self, label, tightLeptonSel, cleanJet, year, isSMS):
         self.label = "" if (label in ["",None]) else ("_"+label)
         self.cleanJet = cleanJet
         self.year     = year
         self.debug    = False
+        self.isSMS    = isSMS
 
         if self.year == 2016:
             self.btagMediumCut =  0.6321
@@ -208,9 +209,7 @@ class edgeFriends:
                     ('mindeltaR_loose' + label, 'F'),
         ]
 
-        ################## SUSY massess  
-        biglist.append( ( 'GenSusyMScan1{lab}'.format(lab=label),'I') )
-        biglist.append( ( 'GenSusyMScan2{lab}'.format(lab=label),'I') )
+
 
             
          
@@ -343,7 +342,7 @@ class edgeFriends:
         self.out.fillBranch('mindeltaR_loose' + self.label,  mindeltaR_loose )
 
 
-        if nLepTight < 2: return False
+        if nLepTight < 2 and self.isSMS: return False
         self.out.fillBranch('nLepTight'        + self.label, nLepTight)
         self.out.fillBranch('nLepLoose'        + self.label, nLepLoose)
         self.out.fillBranch('nLepSelLoose'     + self.label, len(lepsl))
@@ -432,16 +431,6 @@ class edgeFriends:
         self.out.fillBranch('GenMET_pt'             + self.label, -1                    )
         self.out.fillBranch('GenMET_phi'            + self.label, -1                    )
 
-        ################## SUSY masses stuff
-        masses = {}
-        # TO DO !!
-        self.isSMS = False
-        #for mass in self.susymasslist:
-        #    masses[mass] = (-1 if not hasattr(event, mass) else getattr(event, mass) )
-        #    self.out.fillBranch(mass + self.label, masses[mass])
-        #self.isSMS =  (masses['GenSusyMScan1'] > 0 or masses['GenSusyMNeutralino2'] > 0)
-
-        
         ################### Isotracks stuff
         self.out.fillBranch('nPFLep5'  + self.label, event.nPFLep5 )       
         self.out.fillBranch('nPFHad10' + self.label, event.nPFHad10)
