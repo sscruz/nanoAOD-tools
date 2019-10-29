@@ -189,11 +189,11 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     )
 
     mod = [ goodLepProducer, skimRecoLeps, isoTrackAnalysis]
-
-    era = sampOpt['name'].split(sampOpt['year'])[1][0] # lol 
-    jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era) 
-    jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, jetType="AK8PFPuppi")
-    print 'missing jecs!!'
+    
+    yearflag=  sampOpt['year'] + 'FastSim' if sampOpt['isFastSim'] else ''
+    era = sampOpt['name'].split(sampOpt['year'])[1][0] if sampOpt['isData'] else '' # lol 
+    jmeUncert = createJMECorrector( not sampOpt['isData'], yearflag, era) 
+    jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], yearflag, era, jetType="AK8PFPuppi" if yearflag != '2016FastSim' else 'AK8PFchs')
     mod.extend([jmeUncert(),jmeUncertAK8()])
 
     if not sampOpt['isData']:

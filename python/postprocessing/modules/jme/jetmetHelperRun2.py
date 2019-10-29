@@ -8,7 +8,12 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetRecalib import *
 # JEC dict
 jecTagsMC = {'2016' : 'Summer16_07Aug2017_V11_MC', 
              '2017' : 'Fall17_17Nov2017_V32_MC', 
-             '2018' : 'Autumn18_V19_MC'}
+             '2018' : 'Autumn18_V19_MC',
+             '2016FastSim' : 'Spring16_FastSimV1_MC',
+             '2017FastSim' : 'Fall17_FastSimV1_MC',
+             '2018FastSim' : 'Autumn18_FastSimV1_MC',
+
+}
 
 archiveTagsDATA = {'2016' : 'Summer16_07Aug2017_V11_DATA', 
                    '2017' : 'Fall17_17Nov2017_V32_DATA', 
@@ -35,22 +40,30 @@ jecTagsDATA = { '2016B' : 'Summer16_07Aug2017BCD_V11_DATA',
 
 jerTagsMC = {'2016' : 'Summer16_25nsV1_MC',
              '2017' : 'Fall17_V3_MC',
-             '2018' : 'Fall17_V3_MC'
+             '2018' : 'Fall17_V3_MC',
+             '2016FastSim' : 'Summer16_25nsV1_MC',  
+             '2017FastSim' : 'Fall17_V3_MC',        
+             '2018FastSim' : 'Fall17_V3_MC'         
             }
 
 #jet mass resolution: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
 #nominal, up, down
 jmrValues = {'2016' : [1.0, 1.2, 0.8],
              '2017' : [1.09, 1.14, 1.04],
-             '2018' : [1.09, 1.14, 1.04]        # Use 2017 values for 2018 until 2018 are released
-            }
-
+             '2018' : [1.09, 1.14, 1.04],        # Use 2017 values for 2018 until 2018 are released
+             '2016FastSim' : [1.0, 1.2, 0.8],   
+             '2017FastSim' : [1.09, 1.14, 1.04],            
+             '2018FastSim' : [1.09, 1.14, 1.04],
+}
 #jet mass scale
 #W-tagging PUPPI softdrop JMS values: https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging
 #2016 values 
 jmsValues = { '2016' : [1.00, 0.9906, 1.0094], #nominal, down, up
               '2017' : [0.982, 0.978, 0.986],
-              '2018' : [0.982, 0.978, 0.986] # Use 2017 values for 2018 until 2018 are released
+              '2018' : [0.982, 0.978, 0.986], # Use 2017 values for 2018 until 2018 are released
+              '2016FastSim' : [1.00, 0.9906, 1.0094], #nominal, down, up
+              '2017FastSim' : [0.982, 0.978, 0.986],
+              '2018FastSim' : [0.982, 0.978, 0.986] # Use 2017 values for 2018 until 2018 are released
             }
 
 def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total", redojec=False, jetType = "AK4PFchs", noGroom=False):
@@ -70,7 +83,7 @@ def createJMECorrector(isMC=True, dataYear=2016, runPeriod="B", jesUncert="Total
     jmeCorrections = None
     #jme corrections
     if isMC:
-        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear, globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jerTag=jerTag_, jetType = jetType, noGroom = noGroom, jmrVals = jmrValues_, jmsVals = jmsValues_)
+        jmeCorrections = lambda : jetmetUncertaintiesProducer(era=dataYear.replace('FastSim',''), globalTag=jecTag_, jesUncertainties=jmeUncert_, redoJEC=redojec, jerTag=jerTag_, jetType = jetType, noGroom = noGroom, jmrVals = jmrValues_, jmsVals = jmsValues_)
     else:
         jmeCorrections = lambda : jetRecalib(globalTag=jecTag_, archive=archiveTag[dataYear], jetType=jetType, redojec=redojec)
     return jmeCorrections

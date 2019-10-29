@@ -54,7 +54,8 @@ class jetSmearer(Module):
         self.jerSF_and_Uncertainty = ROOT.PyJetResolutionScaleFactorWrapper(os.path.join(self.jerInputFilePath, self.jerUncertaintyInputFileName))
         
     def endJob(self):
-        shutil.rmtree(self.jerInputFilePath)
+        pass
+        #shutil.rmtree(self.jerInputFilePath)
 
     def setSeed(self,event):
         """Set seed deterministically."""
