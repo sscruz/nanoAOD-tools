@@ -64,3 +64,4 @@ for sample in samples:
     sample.options['isData'] = True
     sample.options['year']   = '2017'
     sample.name = sample.name + '_2017'
+    sample.options['scan'] = None
