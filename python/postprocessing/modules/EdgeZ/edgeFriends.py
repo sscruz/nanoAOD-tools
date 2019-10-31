@@ -342,7 +342,8 @@ class edgeFriends:
         self.out.fillBranch('mindeltaR_loose' + self.label,  mindeltaR_loose )
 
 
-        if nLepTight < 2 and self.isSMS: return False
+        if nLepTight < 2: return False
+
         self.out.fillBranch('nLepTight'        + self.label, nLepTight)
         self.out.fillBranch('nLepLoose'        + self.label, nLepLoose)
         self.out.fillBranch('nLepSelLoose'     + self.label, len(lepsl))
@@ -1270,7 +1271,7 @@ class edgeFriends:
 def _susyEdgeLoose(lep,year):
     leppt = lep.pt # ecorr is corrected above
 
-    if leppt <= 5.: return False # Atencion before 10.
+    if leppt <= 10.: return False # Atencion before 10.
     if abs(lep.dxy) > 0.05: return False
     if abs(lep.dz ) > 0.1: return False
     if lep.sip3d > 8: return False
