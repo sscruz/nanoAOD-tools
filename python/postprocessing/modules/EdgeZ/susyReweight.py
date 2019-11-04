@@ -37,7 +37,7 @@ class susyReweight(Module):
                 self.partpt2 = 1000023
                 
         elif self.model == "T6bb": 
-           self.part1 = 1000005
+            self.part1 = 1000005
             self.part2 = 1000023
         elif self.model == "T5ZZ":
             self.part1 = 1000021
@@ -46,6 +46,9 @@ class susyReweight(Module):
             raise RuntimeError("Unknown model %s"%self.model)
 
         self.sumWeights = {} 
+        self.sumWeightsISR = {} 
+        self.sumWeightsISRUp = {} 
+        self.sumWeightsISRDn = {} 
     def beginJob(self):
 	pass
     def endJob(self):
@@ -54,9 +57,9 @@ class susyReweight(Module):
         self.out = wrappedOutputTree
         self.out.branch( 'GenSusyMScan1_mass', 'F')
         self.out.branch( 'GenSusyMScan2_mass', 'F')
-        self.out.branch( 'isrWeight', 'F')
-        self.out.branch( 'isrWeight_up', 'F')
-        self.out.branch( 'isrWeight_dn', 'F')
+        self.out.branch( 'genWeight_isrWeight', 'F')
+        self.out.branch( 'genWeight_isrWeight_up', 'F')
+        self.out.branch( 'genWeight_isrWeight_dn', 'F')
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         outputFile.cd()
@@ -74,15 +77,15 @@ class susyReweight(Module):
         runs_susy.Fill()
         runs_susy.Write()
 
-    def doStrongISRRw(event):
+    def doStrongISRRw(self,event):
         # https://indico.cern.ch/event/592621/contributions/2398559/attachments/1383909/2105089/16-12-05_ana_manuelf_isr.pdf
         nisr = 0 
         leps = [ x for x in Collection(event, "Electron")] + [ x for x in Collection(event, "Muon")]
-        leps = filter( map x : _susyEdgeLoose(x) and _susyEdgeTight(x), leps)
+        leps = filter( lambda x : _susyEdgeLoose(x) and _susyEdgeTight(x), leps)
         jets = [ x for x in Collection(event, "Jet")]
         gens = [ x for x in Collection(event, "GenPart")]
         
-        jets = filter( map x : x.pt > 35 and abs(x.eta) < 2.4)
+        jets = filter( lambda x : x.pt > 35 and abs(x.eta) < 2.4)
         
         for jet in jets: 
             matched = False
@@ -99,10 +102,10 @@ class susyReweight(Module):
                 momid = abs(mom.pdgId)
                 if momid not in [6,23,24,25] and momid < 1e6: continue
                 for gen2 in gens: # see if we can match one of the daughters to the jet
-                    if isInDecayOf( gen2, gen, gens)
-                    if deltaR( gen2, jet) < 0.3: 
-                        matched = True
-                        break
+                    if isInDecayOf( gen2, gen, gens):
+                        if deltaR( gen2, jet) < 0.3: 
+                            matched = True
+                            break
                 if matched: break
             if not matched: 
                 nisr = nisr + 1 
@@ -116,7 +119,7 @@ class susyReweight(Module):
         elif nisr >= 6 : return (0.511, 0.244)
         else: raise RuntimeError("WTF") 
     
-    def doEwkISRRwdoEwkISRRw(event):
+    def doEwkISRRw(self,event):
         # https://indico.cern.ch/event/616816/contributions/2489809/attachments/1418579/2174166/17-02-22_ana_isr_ewk.pdf
         gens = [ x for x in Collection(event, "GenPart")]
         gen1 = [ x for x in gens if x.status == 22 and x.pdgId == self.partpt1 ]
@@ -147,8 +150,8 @@ class susyReweight(Module):
             raise RuntimeError("Sparticles not found for model %s and particles %d, %d"%(self.model, self.part1, self.part2))
 
         # ISR reweighthing... Cleaning jets here as well, i hope its not too slow
-        if self.model in ['T5ZZ', 'T6bb'] : isrW, isrWUp = doStrongISRRw(event)
-        elif self.model in ['TChiWZ', 'TChiZZ','TChiHZ']: isrW, isrWUp = doEwkISRRw(event)
+        if self.model in ['T5ZZ', 'T6bb'] : isrW, isrWUp = self.doStrongISRRw(event)
+        elif self.model in ['TChiWZ', 'TChiZZ','TChiHZ']: isrW, isrWUp = self.doEwkISRRw(event)
 
         if (mass1, mass2) not in self.sumWeights: 
             self.sumWeights[(mass1,mass2)] = event.genWeight 
