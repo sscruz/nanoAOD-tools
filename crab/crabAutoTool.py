@@ -33,7 +33,7 @@ def sendMailTo(main, error=False): #, sample, status):
     server.quit()
 
 def checkStatusTask(task):
-    
+    print 'checking', task
     p = subprocess.Popen(['crab','status', '-d',task],
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
@@ -48,7 +48,10 @@ def checkStatusTask(task):
               "fail":0,
               "total":0,
               }
-    
+    if 'Cannot retrieve the status_cache file.' in log: 
+        print 'Warning, cannot retrieve status cache for %s'%task
+        return taskName, ext, jobInfos
+        
     for line in log.splitlines(): #("\n"):
         
         if "Task name" in line:
@@ -171,7 +174,7 @@ def prepareReport(tasks):
 
 
 
-def crabAutoTool(reset=False, regTasks="analysis_*/*"):
+def crabAutoTool(reset=False, regTasks="crab_*/*"):
    
     #ending cron job if credientials are timed-out / validated
     p = subprocess.Popen(['voms-proxy-info'],
