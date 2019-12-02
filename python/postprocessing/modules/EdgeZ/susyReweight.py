@@ -19,7 +19,19 @@ def isInDecayOf( daught, mother, gens):
             isIn = True
             break
     return isIn
-            
+
+def getRightParentage( gen, gens): 
+    parentage = []
+    idx = gens.index(gen)
+
+    while (idx > -1):
+        if abs(gens[idx].pdgId) == 6: return True
+        if abs(gens[idx].pdgId) == 23: return True
+        if abs(gens[idx].pdgId) == 24: return True
+        if abs(gens[idx].pdgId) == 25: return True
+        if abs(gens[idx].pdgId) > 99999: return True
+        idx = gens[idx].genPartIdxMother
+    return False
 
 class susyReweight(Module):
     def __init__(self, model):
@@ -81,12 +93,11 @@ class susyReweight(Module):
         # https://indico.cern.ch/event/592621/contributions/2398559/attachments/1383909/2105089/16-12-05_ana_manuelf_isr.pdf
         nisr = 0 
         leps = [ x for x in Collection(event, "Electron")] + [ x for x in Collection(event, "Muon")]
-        leps = filter( lambda x : _susyEdgeLoose(x) and _susyEdgeTight(x), leps)
+        leps = filter( lambda x : _susyEdgeLoose(x, event.year) and _susyEdgeTight(x,event.year), leps)
         jets = [ x for x in Collection(event, "Jet")]
         gens = [ x for x in Collection(event, "GenPart")]
         
-        jets = filter( lambda x : x.pt > 35 and abs(x.eta) < 2.4)
-        
+        jets = filter( lambda x : x.pt > 35 and abs(x.eta) < 2.4, jets)
         for jet in jets: 
             matched = False
             skip = False
@@ -96,20 +107,16 @@ class susyReweight(Module):
                     break
             if skip: continue
             for gen in gens:
-                if abs(gen.pdgId) > 5 or gen.status() != 23: continue
+                if abs(gen.pdgId) > 5 or gen.status != 23: continue
                 if gen.genPartIdxMother < 0: continue 
-                mom   = gens[gen.genPartIdxMother]
-                momid = abs(mom.pdgId)
-                if momid not in [6,23,24,25] and momid < 1e6: continue
-                for gen2 in gens: # see if we can match one of the daughters to the jet
-                    if isInDecayOf( gen2, gen, gens):
-                        if deltaR( gen2, jet) < 0.3: 
-                            matched = True
-                            break
-                if matched: break
+                if deltaR( jet, gen) > 0.3: continue
+                if not getRightParentage( gen, gens): continue
+                matched = True
+                break
+                
             if not matched: 
                 nisr = nisr + 1 
-
+        
         if nisr == 0   : return (1,0         ) 
         elif nisr == 1 : return (0.920, 0.04 )
         elif nisr == 2 : return (0.821, 0.09 )
@@ -148,11 +155,9 @@ class susyReweight(Module):
                 mass2 = gen.mass
         if mass1 < 0 or mass2 < 0:
             raise RuntimeError("Sparticles not found for model %s and particles %d, %d"%(self.model, self.part1, self.part2))
-
         # ISR reweighthing... Cleaning jets here as well, i hope its not too slow
         if self.model in ['T5ZZ', 'T6bb'] : isrW, isrWUp = self.doStrongISRRw(event)
         elif self.model in ['TChiWZ', 'TChiZZ','TChiHZ']: isrW, isrWUp = self.doEwkISRRw(event)
-
         if (mass1, mass2) not in self.sumWeights: 
             self.sumWeights[(mass1,mass2)] = event.genWeight 
             self.sumWeightsISR[(mass1,mass2)] = event.genWeight*isrW
@@ -169,5 +174,4 @@ class susyReweight(Module):
         self.out.fillBranch('genWeight_isrWeight'   , event.genWeight*isrW  )
         self.out.fillBranch('genWeight_isrWeight_up', event.genWeight*isrWUp)
         self.out.fillBranch('genWeight_isrWeight_dn', event.genWeight*(isrW - (isrWUp-isrW)))
-
         return True
