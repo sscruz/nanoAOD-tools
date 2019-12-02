@@ -80,7 +80,7 @@ class jetmetUncertaintiesProducer(Module):
                 self.jesUncertainties = sources
 
         # Define the jet recalibrator            
-        self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
+        self.jetReCalibrator = JetReCalibrator(globalTag, jetType , False, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
 
         # Define the recalibrator for level 1 corrections only
         self.jetReCalibratorL1  = JetReCalibrator(globalTag, jetType , False, self.jesInputFilePath, calculateSeparateCorrections = True, calculateType1METCorrection  = False, upToLevel=1)

@@ -102,7 +102,7 @@ class fatJetUncertaintiesProducer(Module):
                 self.jesUncertainties = sources
             
         if self.redoJEC :
-            self.jetReCalibrator = JetReCalibrator(globalTag, jetType , True, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
+            self.jetReCalibrator = JetReCalibrator(globalTag, jetType , False, self.jesInputFilePath, calculateSeparateCorrections = False, calculateType1METCorrection  = False)
         
 
         # load libraries for accessing JES scale factors and uncertainties from txt files
