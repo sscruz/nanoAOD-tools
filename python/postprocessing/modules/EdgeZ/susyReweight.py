@@ -54,6 +54,10 @@ class susyReweight(Module):
         elif self.model == "T5ZZ":
             self.part1 = 1000021
             self.part2 = 1000022
+        elif self.model == "TSlep":
+            self.part1 = 2000013
+            self.part2 = 1000022
+            
         else:
             raise RuntimeError("Unknown model %s"%self.model)
 
@@ -157,7 +161,7 @@ class susyReweight(Module):
             raise RuntimeError("Sparticles not found for model %s and particles %d, %d"%(self.model, self.part1, self.part2))
         # ISR reweighthing... Cleaning jets here as well, i hope its not too slow
         if self.model in ['T5ZZ', 'T6bb'] : isrW, isrWUp = self.doStrongISRRw(event)
-        elif self.model in ['TChiWZ', 'TChiZZ','TChiHZ']: isrW, isrWUp = self.doEwkISRRw(event)
+        elif self.model in ['TChiWZ', 'TChiZZ','TChiHZ','TSlep']: isrW, isrWUp = self.doEwkISRRw(event)
         if (mass1, mass2) not in self.sumWeights: 
             self.sumWeights[(mass1,mass2)] = event.genWeight 
             self.sumWeightsISR[(mass1,mass2)] = event.genWeight*isrW
