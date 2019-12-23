@@ -361,8 +361,9 @@ class edgeFriends:
         jetsc    = [j for j in Collection(event,"Jet","nJet")]
         fatjetsc = [fj for fj in Collection(event,"FatJet","nFatJet")] 
         synch = False
+        jetsc = self.smearJets(jetsc,0)
         if not isData and not synch: 
-            jetsc = self.smearJets(jetsc,0)
+            
             genparts = [g for g in Collection(event,"GenPart","nGenPart")]
             genjets = [j for j in Collection(event, "GenJet", "nGenJet")] # Atencion
 
@@ -387,9 +388,10 @@ class edgeFriends:
 
         ################## Treatment of MET
         (met, metphi)  = (event.METFixEE2017_pt, event.METFixEE2017_phi) if (event.year == 2017) else (event.MET_pt, event.MET_phi)
-        if not isData and not synch:
+        (met, metphi) = (event.METFixEE2017_pt_nom, event.METFixEE2017_phi_nom) if (event.year == 2017) else (event.MET_pt_nom, event.MET_phi_nom)
+        if not isData:
             ntrue = event.Pileup_nTrueInt
-            (met, metphi) = (event.METFixEE2017_pt_nom, event.METFixEE2017_phi_nom) if (event.year == 2017) else (event.MET_pt_nom, event.MET_phi_nom)
+
         metp4 = ROOT.TLorentzVector()
         metp4.SetPtEtaPhiM(met, 0, metphi, 0)
         metp4obj = ROOT.TLorentzVector()

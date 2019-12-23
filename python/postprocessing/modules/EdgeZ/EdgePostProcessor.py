@@ -60,21 +60,23 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
     dataSamples = eval('dataSamples%d'%doYear)
 
     filteredSamples = [] 
-    filterList = [#'WZTo2L2Q', 'ZZTo2L2Nu'
-                  'TTJets_SingleLeptonFromT','TTJets_SingleLeptonFromT','TTTo2L2Nu','TTToSemiLeptonic',
-                  'DYJetsToLL_M50',
-                  'DYJetsToLL_M10to50',
-                  'WWTo2L2Nu',
-                  'WZTo3LNu',
-                  'WJetsToLNu',
-                  'T_tch', 'Tbar_tch', 'TW','TbarW',
-                  'ZZTo4L', 'ZZTo2Q2Nu', 
-                  'GluGluToContinToZZTo2e2mu', 'GluGluToContinToZZTo2e2nu', 'GluGluToContinToZZTo2e2tau',
-                  'GluGluToContinToZZTo2mu2nu','GluGluToContinToZZTo2mu2tau','GluGluToContinToZZTo4e',
-                  'GluGluToContinToZZTo4mu', 'GluGluToContinToZZTo4tau',
-                  'TTZToLLNuNu','TTZToLLNuNu_m1to10',
-                  'TTWToLNu', 
-                  'WWW','WWZ','WZZ','ZZZ','TTHnobb'
+    filterList = [
+        'WZTo2L2Q', 'ZZTo2L2Nu'
+        'TTJets_SingleLeptonFromT','TTJets_SingleLeptonFromT','TTTo2L2Nu','TTToSemiLeptonic',
+        'DYJetsToLL_M50',
+        'DYJetsToLL_M10to50',
+        'WWTo2L2Nu',
+        'WZTo3LNu',
+        'WJetsToLNu',
+        'T_tch', 'Tbar_tch', 'TW','TbarW',
+        'ZZTo4L', 'ZZTo2Q2Nu', 
+        'GluGluToContinToZZTo2e2mu', 'GluGluToContinToZZTo2e2nu', 'GluGluToContinToZZTo2e2tau',
+        'GluGluToContinToZZTo2mu2nu','GluGluToContinToZZTo2mu2tau','GluGluToContinToZZTo4e',
+        'GluGluToContinToZZTo4mu', 'GluGluToContinToZZTo4tau',
+        'TTZToLLNuNu','TTZToLLNuNu_m1to10',
+        'TTWToLNu', 
+        #'WWW','WWZ','WZZ','TTHnobb',
+        'TChiWZ', #'TChi' , "TSlep"
     ]
     filterOut = ['DYJetsToLL_M50_1J','DYJetsToLL_M50_2J']
     for samp in mcSamples:
@@ -92,7 +94,7 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
         selectedSamples = dataSamples
         filtered = [] 
         for samp in selectedSamples:
-            if '2017D' not in samp.name and '2018B' not in samp.name and '2016C' not in samp.name: continue
+            #if '2016C' not in samp.name and '2017D' not in samp.name and '2018B' not in samp.name: continue
             filtered.append( samp)
         selectedSamples = filtered
 
@@ -194,7 +196,7 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
     mod = [ goodLepProducer, skimRecoLeps, isoTrackAnalysis]
     
     era = sampOpt['name'].split(sampOpt['year'])[1][0] if sampOpt['isData'] else '' # lol 
-    jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, isFastSim=sampOpt['isFastSim']) 
+    jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, isFastSim=sampOpt['isFastSim'], metBranchName='MET' if sampOpt['year'] != '2017' else 'METFixEE2017') 
     jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, jetType="AK8PFPuppi" if (sampOpt['year'] != '2016' or not sampOpt['isFastSim']) else 'AK8PFchs',isFastSim=sampOpt['isFastSim'])
     mod.extend([jmeUncert(),jmeUncertAK8()])
 
