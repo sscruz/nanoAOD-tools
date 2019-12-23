@@ -18,7 +18,7 @@ fullSimSamples = [
 ] 
 
 for samp in [TChiWZ_2018 ,TChiWZ_325to1000_2018,TChiWZ_2017 ,TChiWZ_325to1000_2017,TChiWZ_2016 ,TChiWZ_325to1000_2016]:
-    sample['scan']='TChiWZ'
+    samp.options['scan']='TChiWZ'
 
 
 
@@ -31,14 +31,14 @@ TSlepslep_500To1300_2017 = ComponentContainer("TSlepslep_500To1300", "/SMS-TSlep
 TSlepslep_500To1300_2016 = ComponentContainer("TSlepslep_500To1300", "/SMS-TSlepSlep_mSlep-500To1300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv5-PUSummer16v3Fast_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM",1)
 
 for samp in [TSlepslep_2018,TSlepslep_2017,TSlepslep_500To1300_2018,TSlepslep_500To1300_2017,TSlepslep_500To1300_2016]:
-    sample['scan']='TSlep'
+    samp.options['scan']='TSlep'
 
 
 TChiZZ_2017 = ComponentContainer("TChiZZ","/SMS-TChiZZ_ZToLL_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv5-PUFall17Fast_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM",1)
 TChiZZ_2016 = ComponentContainer("TChiZZ","/SMS-TChiZZ_ZToLL_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv5-PUSummer16v3Fast_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM",1)
 
 for samp in [TChiZZ_2017,TChiZZ_2016]:
-    sample['scan']='TChiZZ'
+    samp.options['scan']='TChiZZ'
 
 
 
@@ -63,20 +63,20 @@ signals2018 = [
     TSlepslep_500To1300_2018,
 ]
 
-for sample in signals2016+signals2017+signals2018:
-    sample.options['isData'] = False
-    sample.options['isFastSim'] = True
+for samp in signals2016+signals2017+signals2018:
+    samp.options['isData'] = False
+    samp.options['isFastSim'] = True
 
-for sample in fullSimSamples:
-    sample.options['isFastSim'] = False
+for samp in fullSimSamples:
+    samp.options['isFastSim'] = False
 
-for sample in signals2016:
-    sample.options['year']   = '2016'
-    sample.name = sample.name + '_2016'
-for sample in signals2017:
-    sample.options['year']   = '2017'
-    sample.name = sample.name + '_2017'
-for sample in signals2018:
-    sample.options['year']   = '2018'
-    sample.name = sample.name + '_2018'
+for samp in signals2016:
+    samp.options['year']   = '2016'
+    samp.name = samp.name + '_2016'
+for samp in signals2017:
+    samp.options['year']   = '2017'
+    samp.name = samp.name + '_2017'
+for samp in signals2018:
+    samp.options['year']   = '2018'
+    samp.name = samp.name + '_2018'
     
