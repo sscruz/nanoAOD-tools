@@ -157,14 +157,19 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
 
     from PhysicsTools.NanoAODTools.postprocessing.framework.crabhelper import inputFiles,runsAndLumis
 
-    try:
-        with open('options_sample.json','r') as sampoptjson: 
+    if 'SAMPLE_JSON' in os.environ:
+        with open(os.environ['SAMPLE_JSON'],'r') as sampoptjson: 
             sampOpt = json.loads(sampoptjson.read())
             sampoptjson.close()
-    except: 
-        raise RuntimeError("No options_sample.json found")
+    else: 
+        try:
+            with open('options_sample.json','r') as sampoptjson: 
+                sampOpt = json.loads(sampoptjson.read())
+                sampoptjson.close()
+        except: 
+            raise RuntimeError("No options_sample.json found")
 
-
+        
     addFlags = AddFlags([(('isData','F'), lambda ev : sampOpt['isData'] ),
                          (('year','i')  , lambda ev : int(sampOpt['year']) ),
                      ]) #more flags will be added below
@@ -203,8 +208,8 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         if sampOpt['scan']:
             countScans = susyReweight( sampOpt['scan'] ) 
             mod = [countScans] + mod
-
-    mod.append(addFlags)
+        
+    mod = [addFlags] + mod
     # now adding the edge part at the end 
     mod.append(edgeFriends)
 
