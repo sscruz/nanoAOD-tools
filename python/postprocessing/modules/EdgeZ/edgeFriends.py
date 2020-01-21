@@ -151,20 +151,22 @@ class edgeFriends:
                     ("Lep1_phi"+label, "F"),
                     ("Lep1_pdgId"+label, "I"), 
                     ("Lep1_tightCharge"+label, "F"), 
-                    ("Lep1_genPartFlav"+label, "I"), 
+                    ("Lep1_genPartFlav"+label, "I"),
+                    ("Lep1_genPartIdx"+label, "I"), 
                     ("Lep2_pt"+label, "F"), 
                     ("Lep2_eta"+label, "F"),
                     ("Lep2_phi"+label, "F"),
                     ("Lep2_pdgId"+label, "I"),
                     ("Lep2_tightCharge"+label, "F"),
                     ("Lep2_genPartFlav"+label, "I"), 
+                    ("Lep2_genPartIdx"+label, "I"), 
                     ("nLepSelLoose"+label, "I"), 
                     {"name" : "LepSelLoose_pt"+label     , "rootBranchType" : "F", "lenVar" : "nLepSelLoose"+label}, 
                     {"name" : "LepSelLoose_eta"+label    , "rootBranchType" : "F", "lenVar" : "nLepSelLoose"+label}, 
                     {"name" : "LepSelLoose_phi"+label    , "rootBranchType" : "F", "lenVar" : "nLepSelLoose"+label},
                     {"name" : "LepSelLoose_pdgId"+label  , "rootBranchType" : "I", "lenVar" : "nLepSelLoose"+label}, 
-                    {"name" : "LepSelLoose_pdgId"+label  , "rootBranchType" : "I", "lenVar" : "nLepSelLoose"+label}, 
                     {"name" : "LepSelLoose_isTight"+label, "rootBranchType" : "I", "lenVar" : "nLepSelLoose"+label}, 
+                    {"name" : "LepSelLoose_genPartIdx"+label, "rootBranchType" : "I", "lenVar" : "nLepSelLoose"+label}, 
                     ("PileupW"+label, "F"), 
                     ("PileupW_Up"+label, "F"),
                     ("PileupW_Dn"+label, "F"), 
@@ -250,7 +252,6 @@ class edgeFriends:
 
     def analyze(self, event):
         #self.debug = (event.event == 65627548)
-
         isData = event.isData
         ##### MC variables
         var_mcPt = 10 # mcPt
@@ -350,10 +351,13 @@ class edgeFriends:
         for l in lepsl:
             setattr(l, 'isTight', _susyEdgeTight(l,event.year))
 
-        for var in 'pt,eta,phi,pdgId,isTight'.split(','):
+        for var in 'pt,eta,phi,pdgId,isTight,genPartIdx'.split(','):
             looselepret = [] 
             for l in lepsl: 
-                looselepret.append( getattr(l, var))
+                if var in ['genPartIdx'] and isData:
+                    looselepret.append( 0 )
+                else:
+                    looselepret.append( getattr(l, var, 0))
             self.out.fillBranch( "LepSelLoose_%s"%(var)+self.label, looselepret)
 
         # jet stuff 
@@ -361,9 +365,9 @@ class edgeFriends:
         jetsc    = [j for j in Collection(event,"Jet","nJet")]
         fatjetsc = [fj for fj in Collection(event,"FatJet","nFatJet")] 
         synch = False
-        jetsc = self.smearJets(jetsc,0)
+
         if not isData and not synch: 
-            
+            jetsc = self.smearJets(jetsc,0)            
             genparts = [g for g in Collection(event,"GenPart","nGenPart")]
             genjets = [j for j in Collection(event, "GenJet", "nGenJet")] # Atencion
 
@@ -388,8 +392,8 @@ class edgeFriends:
 
         ################## Treatment of MET
         (met, metphi)  = (event.METFixEE2017_pt, event.METFixEE2017_phi) if (event.year == 2017) else (event.MET_pt, event.MET_phi)
-        (met, metphi) = (event.METFixEE2017_pt_nom, event.METFixEE2017_phi_nom) if (event.year == 2017) else (event.MET_pt_nom, event.MET_phi_nom)
         if not isData:
+            (met, metphi) = (event.METFixEE2017_pt_nom, event.METFixEE2017_phi_nom) if (event.year == 2017) else (event.MET_pt_nom, event.MET_phi_nom)
             ntrue = event.Pileup_nTrueInt
 
         metp4 = ROOT.TLorentzVector()
@@ -505,8 +509,8 @@ class edgeFriends:
             nPairLep = 2
             lcount = 1
             for lep in [lepst[0],lepst[1]]:
-                for lfloat in 'pt eta phi pdgId tightCharge'.split(): # dxy dz sip3d pfRelIso03_all pfRelIso04_all mvaFall17V1Iso mvaFall17V1noIso miniPFRelIso_all 
-                    if lfloat == 'genPartFlav' and isData:
+                for lfloat in 'pt eta phi pdgId tightCharge genPartFlav genPartIdx'.split(): # dxy dz sip3d pfRelIso03_all pfRelIso04_all mvaFall17V1Iso mvaFall17V1noIso miniPFRelIso_all 
+                    if (lfloat == 'genPartFlav' or lfloat == 'genPartIdx') and isData:
                         lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = 1
                     else:
                         lepret["Lep"+str(lcount)+"_"+lfloat+self.label] = getattr(lep,lfloat)
@@ -949,7 +953,7 @@ class edgeFriends:
     def setJetCollection(self, jetcoll, lepst):
         for j in jetcoll:
             j._clean = True
-            if abs(j.eta) > 2.4 or j.pt < 25.: # Marius change, previus 25 # Now changed to 25 again
+            if abs(j.eta) > 2.4 or j.pt < 15.: # Marius change, previus 25 # Now changed to 25 again
                 j._clean = False
                 continue
             if j.pt < 25 and j.btagDeepB < self.btagMediumCut: 
@@ -1004,6 +1008,7 @@ class edgeFriends:
             if not j._clean: continue
             bt = j.btagDeepB
             pt = j.pt
+            retlist.append(ijc)          
             if pt > 25 and bt > self.btagMediumCut: 
                 nb25 += 1
                 thebjets25.append(j)                   
@@ -1014,7 +1019,6 @@ class edgeFriends:
             if pt > 35:
                 thejets.append(j)
                 n35 += 1; ht35 += pt
-                retlist.append(ijc)          
                 if bt > self.btagMediumCut:
                     nb35 += 1
                     thebjets.append(j)
@@ -1147,7 +1151,6 @@ class edgeFriends:
     def smearJets(self, jetcol, syst):
 	
         for j in jetcol:
-            quot = 1.0-getattr(j, "rawFactor") #getattr(j, "CorrFactor_L1L2L3Res") if getattr(j, "CorrFactor_L1L2L3Res") > 0 else getattr(j, "CorrFactor_L1L2L3")
             if syst == 1: 
                 j.pt = j.pt_jesTotalUp
             elif syst == -1:

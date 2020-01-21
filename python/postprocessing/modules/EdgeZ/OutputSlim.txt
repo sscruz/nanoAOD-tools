@@ -8,3 +8,4 @@ keep HLT_*Mu*
 keep HLT_*MET*
 keep HLT_*HT*
 keep Flag_*
+keep *GenPart*
