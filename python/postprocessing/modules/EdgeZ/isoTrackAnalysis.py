@@ -59,6 +59,7 @@ class IsoTrackAnalysis(Module):
             if cand.pfRelIso03_chg*pt > 5: continue
             if cand.pfRelIso03_chg > 0.2: continue
             nPFLep5 = nPFLep5 + 1 
+            print 'we have a PF lep', cand.pdgId, cand.pt, cand.eta, cand.phi
             toclean.append(cand)
 
 

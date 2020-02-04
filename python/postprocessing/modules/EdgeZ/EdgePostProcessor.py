@@ -61,31 +61,39 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
 
     filteredSamples = [] 
     filterList = [
-        'WZTo2L2Q', 'ZZTo2L2Nu'
-        'TTJets_SingleLeptonFromT','TTJets_SingleLeptonFromT','TTTo2L2Nu','TTToSemiLeptonic',
-        'DYJetsToLL_M50',
-        'DYJetsToLL_M10to50',
-        'WWTo2L2Nu',
-        'WZTo3LNu',
-        'WJetsToLNu',
-        'T_tch', 'Tbar_tch', 'TW','TbarW',
-        'ZZTo4L', 'ZZTo2Q2Nu', 
-        'GluGluToContinToZZTo2e2mu', 'GluGluToContinToZZTo2e2nu', 'GluGluToContinToZZTo2e2tau',
-        'GluGluToContinToZZTo2mu2nu','GluGluToContinToZZTo2mu2tau','GluGluToContinToZZTo4e',
-        'GluGluToContinToZZTo4mu', 'GluGluToContinToZZTo4tau',
-        'TTZToLLNuNu','TTZToLLNuNu_m1to10',
-        'TTWToLNu', 
+        #'WZTo2L2Q', 
+        #'TTJets_SingleLeptonFromT','TTJets_SingleLeptonFromT','TTTo2L2Nu','TTToSemiLeptonic',
+        #'DYJetsToLL_M50',
+        #'DYJetsToLL_M10to50',
+        #'WWTo2L2Nu',
+        #'WZTo3LNu',
+        #'WJetsToLNu',
+        #'T_tch', 'Tbar_tch', 'TW','TbarW',
+        #'ZZTo2L2Nu',
+        #'ZZTo4L', 'ZZTo2Q2Nu', 
+        #'GluGluToContinToZZTo2e2mu', 'GluGluToContinToZZTo2e2nu', 'GluGluToContinToZZTo2e2tau',
+        #'GluGluToContinToZZTo2mu2nu','GluGluToContinToZZTo2mu2tau','GluGluToContinToZZTo4e',
+        #'GluGluToContinToZZTo4mu', 'GluGluToContinToZZTo4tau',
+        #'TTZToLLNuNu','TTZToLLNuNu_m1to10',
+        #'TTWToLNu', 
         #'WWW','WWZ','WZZ','TTHnobb',
-        'TChiWZ', #'TChi' , "TSlep"
+        ##'TChiWZ', 'TChi' ,
+        "TSlep"
     ]
-    filterOut = ['DYJetsToLL_M50_1J','DYJetsToLL_M50_2J']
+    filterOut = ['DYJetsToLL_M50_1J','DYJetsToLL_M50_2J','WZTo2L2Q','DYJetsToLL_M50_2500toInf','DYJetsToLL_M50_HT100to200','DYJetsToLL_M50_HT200to400','DYJetsToLL_M50_HT400to600','DYJetsToLL_M50_HT600to800','DYJetsToLL_M50_HT800to1200','DYJetsToLL_M50_HT_70to100','DYJetsToLL_M50_600to800', 'DYJetsToLL_M50_100to200','DYJetsToLL_M50_200to400','DYJetsToLL_M50_400to600','DYJetsToLL_M50_800to1200','DYJetsToLL_M50_1200to2500','DYJetsToLL_M50_2500toInf','DYJetsToLL_M50_HT2500_Inf']
     for samp in mcSamples:
+        skip=False
+        print samp.name
         for filt in filterOut : 
-            if filt in samp.name: continue
+            if filt in samp.name:
+                skip=True
+                print 'matches filter'
+        if skip: continue
         for filt in filterList: 
-            if filt in samp.name: filteredSamples.append(samp)
+            if filt in samp.name: 
+                print '-> adding sample', samp.name
+                filteredSamples.append(samp)
     mcSamples = filteredSamples
-    
     if doData:
         from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2016 import triggers2016
         from PhysicsTools.NanoAODTools.postprocessing.datasets.triggers_13TeV_DATA2017 import triggers2017
@@ -105,9 +113,9 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
 
         if doYear in [2016, 2017]:
             # DoubleMuon > DoubleEG> MuonEG
-            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
-            DatasetsAndTriggersMap["DoubleEG"       ] = yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso']
-            DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso']
+            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu']
+            DatasetsAndTriggersMap["DoubleEG"       ] = yeartriggers['triggers_ee']
+            DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_em']
             DatasetsAndTriggersMap["MET" ] = []
         
             DatasetsAndVetosMap["DoubleMuon"    ] = [] 
@@ -117,9 +125,9 @@ if not 'IS_CRAB' in os.environ and not 'IS_RUN' in os.environ:
         
         else: 
             # DoubleMuon > EGamma > MuonEG
-            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu_iso'] + yeartriggers['triggers_3mu']
-            DatasetsAndTriggersMap["EGamma"         ] = yeartriggers['triggers_ee'] + yeartriggers['triggers_3e'] + yeartriggers['triggers_ee_noniso'] + yeartriggers['triggers_1e_iso']
-            DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_mue'] + yeartriggers['triggers_2mu1e'] + yeartriggers['triggers_2e1mu'] + yeartriggers['triggers_mue_noiso']
+            DatasetsAndTriggersMap["DoubleMuon"     ] = yeartriggers['triggers_mumu']
+            DatasetsAndTriggersMap["EGamma"         ] = yeartriggers['triggers_ee']
+            DatasetsAndTriggersMap["MuonEG"         ] = yeartriggers['triggers_em']
             DatasetsAndTriggersMap["MET" ] = []
         
             DatasetsAndVetosMap["DoubleMuon"    ] = []
@@ -195,12 +203,13 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
 
     mod = [ goodLepProducer, skimRecoLeps, isoTrackAnalysis]
     
-    era = sampOpt['name'].split(sampOpt['year'])[1][0] if sampOpt['isData'] else '' # lol 
-    jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, isFastSim=sampOpt['isFastSim'], metBranchName='MET' if sampOpt['year'] != '2017' else 'METFixEE2017') 
-    jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, jetType="AK8PFPuppi" if (sampOpt['year'] != '2016' or not sampOpt['isFastSim']) else 'AK8PFchs',isFastSim=sampOpt['isFastSim'])
-    mod.extend([jmeUncert(),jmeUncertAK8()])
 
     if not sampOpt['isData']:
+        era = sampOpt['name'].split(sampOpt['year'])[1][0] if sampOpt['isData'] else '' # lol 
+        jmeUncert = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, isFastSim=sampOpt['isFastSim'], metBranchName='MET' if sampOpt['year'] != '2017' else 'METFixEE2017') 
+        jmeUncertAK8 = createJMECorrector( not sampOpt['isData'], sampOpt['year'], era, jetType="AK8PFPuppi" if (sampOpt['year'] != '2016' or not sampOpt['isFastSim']) else 'AK8PFchs',isFastSim=sampOpt['isFastSim'])
+        mod.extend([jmeUncert(),jmeUncertAK8()])
+
         # add pile-up weight before any skim
         puAutoWeight  = eval('puAutoWeight_%s'%sampOpt['year'])
         
@@ -210,8 +219,8 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
         if sampOpt['scan']:
             countScans = susyReweight( sampOpt['scan'] ) 
             mod = [countScans] + mod
-        
     mod = [addFlags] + mod
+
     # now adding the edge part at the end 
     mod.append(edgeFriends)
 
@@ -222,7 +231,7 @@ if 'IS_CRAB' in os.environ or 'IS_RUN' in os.environ:
                                              vetotriggers = sampOpt['vetotriggers'])
         mod = [triggerBitFilter] + mod
 
-
+    mod = [addFlags] + mod 
 
     jsonInput = sampOpt['json'] if 'json' in sampOpt else runsAndLumis()     
     POSTPROCESSOR=PostProcessor(".",inputFiles() if 'IS_CRAB' in os.environ else [],cut,inputSlim,mod,provenance=True,fwkJobReport=True,jsonInput=jsonInput, outputbranchsel=outputSlim)#,friend=True)

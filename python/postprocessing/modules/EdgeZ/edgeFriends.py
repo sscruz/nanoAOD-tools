@@ -1289,7 +1289,7 @@ def _susyEdgeLoose(lep,year):
         if not lep.mediumId: return False
     ## electrons
     if abs(lep.pdgId) == 11:
-        if lepeta > 2.4: return False
+        if lepeta > 2.5: return False
         if (lep.convVeto == 0) or (lep.lostHits != 0): return False
         if year == 2016: return mvaID2016VLoose(lep)
         if year == 2017: return mvaID2017VLoose(lep)
