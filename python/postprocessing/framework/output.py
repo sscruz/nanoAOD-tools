@@ -125,6 +125,7 @@ class FullOutput(OutputTree):
         self._inputTree.readAllBranches()
         self._tree.Fill()
     def write(self):
+        if not self._keepFriendLinks: self._unlinkFriends()
         if self.outputbranchSelection:
             self.outputbranchSelection.selectBranches(self._tree)
         self._tree = self.tree().CopyTree('1', "", self.maxEntries if self.maxEntries else ROOT.TVirtualTreePlayer.kMaxEntries, self.firstEntry)
