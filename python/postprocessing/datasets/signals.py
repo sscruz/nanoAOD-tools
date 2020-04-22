@@ -40,14 +40,40 @@ TChiZZ_2016 = ComponentContainer("TChiZZ","/SMS-TChiZZ_ZToLL_TuneCUETP8M1_13TeV-
 for samp in [TChiZZ_2017,TChiZZ_2016]:
     samp.options['scan']='TChiZZ'
 
+TChiHZ_2018 = ComponentContainer("TChiHZ","/SMS-TChiHZ_HToBB_ZToLL_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-PUFall18Fast_Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM")
+TChiHZ_2017 = ComponentContainer("TChiHZ","/SMS-TChiHZ_HToBB_ZToLL_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv5-PUFall17Fast_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM")
+TChiHZ_2016 = ComponentContainer("TChiHZ","/SMS-TChiHZ_HToBB_ZToLL_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv5-PUSummer16v3Fast_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM")
+
+for samp in [TChiHZ_2017,TChiHZ_2016,TChiHZ_2018]:
+    samp.options['scan']='TChiHZ'
 
 
+T5ZZ_1_2018 = ComponentContainer("T5ZZ_1", "/SMS-T5ZZ_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-PUFall18Fast_Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM",1)
+T5ZZ_1_2017 = ComponentContainer("T5ZZ_1", "/SMS-T5ZZ_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv5-PUFall17Fast_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM",1)
+T5ZZ_1_2016 = ComponentContainer("T5ZZ_1", "/SMS-T5ZZ_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv5-PUSummer16v3Fast_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM",1)
+T5ZZ_2_2018 = ComponentContainer("T5ZZ_2", "/SMS-T5ZZ_mGluino-1850to2400_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIAutumn18NanoAODv5-PUFall18Fast_Nano1June2019_102X_upgrade2018_realistic_v19-v1/NANOAODSIM",1)
+T5ZZ_2_2017 = ComponentContainer("T5ZZ_2", "/SMS-T5ZZ_mGluino-1850to2400_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv5-PUFall17Fast_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM",1)
+T5ZZ_2_2016 = ComponentContainer("T5ZZ_2", "/SMS-T5ZZ_mGluino-1850to2400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16NanoAODv5-PUSummer16v3Fast_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/NANOAODSIM",1)
 
+for samp in [T5ZZ_1_2018,T5ZZ_1_2017,T5ZZ_1_2016,T5ZZ_2_2018,T5ZZ_2_2017,T5ZZ_2_2016]:
+    samp.options['scan']="T5ZZ"
+
+
+T6bb_1_2017 = ComponentContainer("T6bb_1","/SMS-T6bbllslepton_mSbottom-1400To1800_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv5-PUFall17Fast_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM")
+T6bb_2_2017 = ComponentContainer("T6bb_2","/SMS-T6bbllslepton_mSbottom-400To775_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv5-PUFall17Fast_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM")
+T6bb_3_2017 = ComponentContainer("T6bb_3","/SMS-T6bbllslepton_mSbottom-800To1375_TuneCP2_13TeV-madgraphMLM-pythia8/RunIIFall17NanoAODv5-PUFall17Fast_Nano1June2019_102X_mc2017_realistic_v7-v1/NANOAODSIM")
+
+for samp in [T6bb_1_2017, T6bb_2_2017, T6bb_3_2017]:
+    samp.options['scan']="T6bb"
+    
 signals2016 = [
     TChiWZ_2016          ,
     TChiWZ_325to1000_2016,
     TSlepslep_500To1300_2016,
     TChiZZ_2016,
+    TChiHZ_2016,
+    T5ZZ_1_2016,
+    T5ZZ_2_2016,
 ]
 signals2017 = [
     TChiWZ_2017          ,
@@ -55,12 +81,22 @@ signals2017 = [
     TSlepslep_2017,
     TSlepslep_500To1300_2017,
     TChiZZ_2017,
+    TChiHZ_2017,
+    T5ZZ_1_2017,
+    T5ZZ_2_2017,
+    T6bb_1_2017,
+    T6bb_2_2017,
+    T6bb_3_2017,
+
 ]
 signals2018 = [
     TChiWZ_2018          ,
     TChiWZ_325to1000_2018,
     TSlepslep_2018,
     TSlepslep_500To1300_2018,
+    T5ZZ_1_2018,
+    T5ZZ_2_2018,
+    TChiHZ_2018,
 ]
 
 for samp in signals2016+signals2017+signals2018:
